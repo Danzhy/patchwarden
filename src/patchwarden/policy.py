@@ -1,13 +1,28 @@
-"""Policy in code: pre_classify (M1); clamp and check_diff follow in M2.
+"""Policy in code: pre_classify, clamp, check_diff.
 
 These are pure functions. The LLM can make a decision more cautious, never less; the floor it
-can't go below comes from pre_classify.
+can't go below comes from pre_classify. check_diff rejects fixes that game the checks.
 """
 
+import ast
+import difflib
+import io
+import re
+import tokenize
+from collections import Counter
+from collections.abc import Collection
 from fnmatch import fnmatchcase
 
 from patchwarden.config import Config
-from patchwarden.models import Finding, PreClass, PreClassKind
+from patchwarden.models import (
+    ClampResult,
+    Decision,
+    Finding,
+    PreClass,
+    PreClassKind,
+    Violation,
+    ViolationKind,
+)
 from patchwarden.scope import is_test_path, match_path
 
 
@@ -43,3 +58,185 @@ def pre_classify(finding: Finding, cfg: Config) -> PreClass:
             matched_pattern=pat,
         )
     return PreClass(kind=PreClassKind.llm_decides, reason="no policy rule applies")
+
+
+_CAUTION = {Decision.auto_fix: 0, Decision.suggest: 1, Decision.escalate: 2}
+_FLOOR = {
+    PreClassKind.always_escalate: Decision.escalate,
+    PreClassKind.protected_path: Decision.escalate,
+    PreClassKind.auto_fix_allowed: Decision.auto_fix,
+    PreClassKind.llm_decides: Decision.suggest,  # only allowlisted rules are ever auto-fixed
+}
+
+
+def clamp(llm: Decision, pre: PreClass) -> ClampResult:
+    """The LLM's decision, raised to the policy floor. false_positive (dismiss the finding) is
+    accepted only where the LLM decides; elsewhere it becomes the floor, or suggest."""
+    floor = _FLOOR[pre.kind]
+    if llm == Decision.false_positive:
+        if pre.kind == PreClassKind.llm_decides:
+            return ClampResult(decision=llm, clamped=False, reason="LLM: false positive")
+        decision = max(floor, Decision.suggest, key=_CAUTION.__getitem__)
+        return ClampResult(
+            decision=decision,
+            clamped=True,
+            reason=f"false_positive not allowed for {pre.kind}; {pre.reason}",
+        )
+    if _CAUTION[llm] >= _CAUTION[floor]:
+        return ClampResult(decision=llm, clamped=False, reason=f"LLM: {llm}")
+    return ClampResult(decision=floor, clamped=True, reason=f"raised to {floor}: {pre.reason}")
+
+
+# Comment markers that silence an analyzer instead of fixing the code.
+SUPPRESSIONS = {
+    "noqa": re.compile(r"#\s*noqa\b", re.I),
+    "type: ignore": re.compile(r"#\s*type:\s*ignore\b"),
+    "nosec": re.compile(r"#\s*nosec\b", re.I),
+    "pragma: no cover": re.compile(r"#\s*pragma:\s*no\s*cover\b"),
+    "pylint: disable": re.compile(r"#\s*pylint:\s*disable\b"),
+    "lgtm": re.compile(r"#\s*lgtm\b", re.I),
+    "codeql": re.compile(r"#\s*codeql\[", re.I),
+}
+
+
+def check_diff(
+    changes: dict[str, tuple[str, str]],
+    cfg: Config,
+    *,
+    target_file: str,
+    rule_ids: Collection[str],
+    max_lines: int | None,
+) -> list[Violation]:
+    """Every way the change `{file: (before, after)}` breaks policy. Empty means it's clean."""
+    out: list[Violation] = []
+    V, K = Violation, ViolationKind
+    allow_defaults = any(match_rule(r, cfg.signature_rules) for r in rule_ids)
+    total = 0
+    for file, (before, after) in changes.items():
+        if is_test_path(file, cfg):
+            out.append(V(kind=K.test_file_touched, file=file, detail="fixes may not edit tests"))
+        if pat := match_path(file, cfg.protected_paths):
+            out.append(V(kind=K.protected_file_touched, file=file, detail=f"matches {pat}"))
+        if file != target_file:
+            out.append(
+                V(kind=K.other_file_touched, file=file, detail=f"the finding is in {target_file}")
+            )
+        total += changed_line_count(before, after)
+        out.extend(_suppressions(file, before, after))
+        try:
+            new_tree = ast.parse(after)
+        except SyntaxError as e:
+            out.append(V(kind=K.syntax_error, file=file, detail=f"line {e.lineno}: {e.msg}"))
+            continue
+        try:
+            old_tree = ast.parse(before)
+        except SyntaxError:
+            continue  # nothing to compare against
+        out.extend(_definitions(file, old_tree, new_tree, allow_defaults))
+    if max_lines is not None and total > max_lines:
+        out.append(
+            V(
+                kind=K.too_many_lines,
+                file=target_file,
+                detail=f"{total} lines changed, limit {max_lines}",
+            )
+        )
+    return out
+
+
+def changed_line_count(before: str, after: str) -> int:
+    diff = difflib.unified_diff(before.splitlines(), after.splitlines(), lineterm="", n=0)
+    return sum(1 for ln in diff if ln[:1] in "+-" and not ln.startswith(("+++", "---")))
+
+
+def _comments(text: str) -> list[str]:
+    try:
+        return [
+            t.string
+            for t in tokenize.generate_tokens(io.StringIO(text).readline)
+            if t.type == tokenize.COMMENT
+        ]
+    except (tokenize.TokenError, SyntaxError):
+        # Unparseable: fall back to anything after a "#" (over-counts strings, which only
+        # makes the check stricter).
+        return [ln[ln.index("#") :] for ln in text.splitlines() if "#" in ln]
+
+
+def _suppressions(file: str, before: str, after: str) -> list[Violation]:
+    def count(text: str) -> Counter:
+        c: Counter = Counter()
+        for comment in _comments(text):
+            for name, pat in SUPPRESSIONS.items():
+                c[name] += len(pat.findall(comment))
+        return c
+
+    old, new = count(before), count(after)
+    return [
+        Violation(
+            kind=ViolationKind.suppression_added,
+            file=file,
+            detail=f"adds a '# {name}' comment",
+        )
+        for name in SUPPRESSIONS
+        if new[name] > old[name]
+    ]
+
+
+def _defs(tree: ast.AST) -> dict[str, ast.AST]:
+    """Qualified name -> node for every def/class, e.g. "Square.area"."""
+    out: dict[str, ast.AST] = {}
+
+    def walk(node: ast.AST, prefix: str) -> None:
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+                name = prefix + child.name
+                out.setdefault(name, child)
+                walk(child, name + ".")
+            else:
+                walk(child, prefix)
+
+    walk(tree, "")
+    return out
+
+
+def _params(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> list[tuple[str, str]]:
+    a = fn.args
+    params = [(p.arg, "posonly") for p in a.posonlyargs] + [(p.arg, "arg") for p in a.args]
+    if a.vararg:
+        params.append((a.vararg.arg, "*"))
+    params += [(p.arg, "kwonly") for p in a.kwonlyargs]
+    if a.kwarg:
+        params.append((a.kwarg.arg, "**"))
+    return params
+
+
+def _defaults(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> list[str]:
+    a = fn.args
+    return [ast.dump(d) for d in a.defaults] + [
+        ast.dump(d) if d is not None else "-" for d in a.kw_defaults
+    ]
+
+
+def _definitions(
+    file: str, old_tree: ast.AST, new_tree: ast.AST, allow_defaults: bool
+) -> list[Violation]:
+    old, new = _defs(old_tree), _defs(new_tree)
+    out = [
+        Violation(kind=ViolationKind.definition_removed, file=file, detail=f"removes {name}")
+        for name in old
+        if name not in new
+    ]
+    for name, node in old.items():
+        new_node = new.get(name)
+        if not isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) or not isinstance(
+            new_node, ast.FunctionDef | ast.AsyncFunctionDef
+        ):
+            continue
+        if _params(node) != _params(new_node):
+            detail = f"changes the parameters of {name}"
+        elif _defaults(node) != _defaults(new_node) and not allow_defaults:
+            detail = f"changes a default value in {name}"
+        else:
+            continue
+        out.append(Violation(kind=ViolationKind.signature_changed, file=file, detail=detail))
+    return out

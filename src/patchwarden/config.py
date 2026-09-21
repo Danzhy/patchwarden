@@ -64,7 +64,14 @@ class Config:
             "**/settings*.py",
         ]
     )
-    # Used from M2 on; defined now so the config schema is stable.
+    # Rules whose fix legitimately changes a parameter default (B006: `x=[]` -> `x=None`).
+    signature_rules: list[str] = field(
+        default_factory=lambda: [
+            "ruff:B006",
+            "ruff:B008",
+            "codeql:py/modification-of-default-value",
+        ]
+    )
     test_command: str | None = None
     test_timeout_s: int = 300
     max_fix_rounds: int = 2

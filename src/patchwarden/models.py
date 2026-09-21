@@ -1,6 +1,6 @@
-"""Pydantic models shared by every stage: findings, pre-classification, scan results.
+"""Pydantic models shared by every stage: findings, pre-classification, scan results, edits.
 
-EditBlock, Patch, VerifyResult and RunState are added in M2-M4, where they're first used.
+VerifyResult and RunState are added in M3-M4, where they're first used.
 """
 
 from enum import StrEnum
@@ -67,3 +67,38 @@ class ScanResult(BaseModel):
     findings: list[Finding]
     preclass: dict[str, PreClass]  # fingerprint -> verdict
     config_hash: str
+
+
+class ClampResult(BaseModel):
+    """The decision after policy.clamp. `clamped` means policy overrode the LLM."""
+
+    decision: Decision
+    clamped: bool
+    reason: str
+
+
+class EditBlock(BaseModel):
+    """One SEARCH/REPLACE edit. `search` must occur exactly once in `file`."""
+
+    file: str
+    search: str
+    replace: str
+
+
+class ViolationKind(StrEnum):
+    """Ways a diff breaks policy (policy.check_diff). Any one of them blocks the fix."""
+
+    syntax_error = "syntax_error"
+    suppression_added = "suppression_added"
+    test_file_touched = "test_file_touched"
+    protected_file_touched = "protected_file_touched"
+    other_file_touched = "other_file_touched"
+    too_many_lines = "too_many_lines"
+    definition_removed = "definition_removed"
+    signature_changed = "signature_changed"
+
+
+class Violation(BaseModel):
+    kind: ViolationKind
+    file: str
+    detail: str

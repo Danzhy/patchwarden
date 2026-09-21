@@ -129,3 +129,35 @@ Consequences for `llm.py` (M3):
   M0) and `UnusedImport.ql` finds the 3 unused imports with correct paths/snippets, ~23 s. Tests
   use a fake `codeql` script.
 - 61 tests, 96% line coverage overall, 100% on `policy.py` and `config.py`.
+
+## M2: workspace, deterministic pass, edits, clamp, check_diff (2026-09-22)
+- **Pitfall found while planning:** `ruff check --fix` over the repo also deletes the unused
+  import in `app/auth/tokens.py`, a protected path. So the deterministic pass runs ruff per file,
+  `--select` limited to that file's `auto_fix_allowed` rules, `--fix-only`, never
+  `--unsafe-fixes`. On the fixture it resolves 6 of the 8 auto-fix candidates (F401 ×2, UP035,
+  UP006 in utils.py; UP004, UP032 in shapes.py). F841 and E711 only have unsafe fixes and stay
+  for the Fixer. Each fixed file is re-scanned with all analyzers and reverted if a new
+  fingerprint appears, check_diff complains, or none of its selected findings went away.
+- Workspace = plain temp copy (skipping `.git`, `.venv`...), not a git worktree: a worktree starts
+  from a commit and would drop uncommitted work. Changes are detected on disk against a snapshot,
+  so ruff's in-place edits count. `apply_to_source` (only `--apply`) refuses, writing nothing, if
+  a target file changed in the repo since the copy. Reads/writes keep CRLF; lines split on `\n`
+  only; the diff carries `\ No newline at end of file`; tested with `git apply --check`.
+- Edits: SEARCH/REPLACE blocks, path on the line above (a ```python fence is skipped). Exact
+  unique match, one fallback ignoring trailing whitespace, still unique. Errors: `bad_path`
+  (absolute, `..`, not an existing UTF-8 `.py`), `empty_search`, `no_match`, `ambiguous`. All or
+  nothing across blocks.
+- `clamp`: escalate for always_escalate / protected_path whatever the LLM says; floor auto_fix
+  for the allowlist, suggest otherwise, so only allowlisted rules are ever auto-fixed.
+  `false_positive` is accepted only when pre-class is `llm_decides` (else → suggest/escalate).
+  `clamped=True` feeds the `triage_policy_disagreement` trace in M3.
+- `check_diff` violations: `test_file_touched`, `protected_file_touched`, `other_file_touched`,
+  `too_many_lines`, `syntax_error`, `suppression_added` (counted in real comments via `tokenize`,
+  so `"# noqa"` in a string is fine; noqa, type: ignore, nosec, pragma: no cover, pylint:
+  disable, lgtm, codeql[...]), `definition_removed` (qualified names like `Square.area`),
+  `signature_changed` (parameter names/kinds/order always; defaults unless the rule is in the new
+  `signature_rules` config key: B006, B008, codeql modification-of-default-value; annotations
+  may change, UP006 rewrites them).
+- `patchwarden fix REPO [--base] [--output patchwarden.patch] [--apply]` runs the deterministic
+  pass only for now; M3 adds the LLM stages and `--no-llm` to keep this behaviour.
+- 133 tests, 96% coverage overall, 98% on `policy.py`.
