@@ -17,6 +17,7 @@ import ast
 import os
 import re
 import shlex
+import shutil
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -37,15 +38,24 @@ def scrubbed_env() -> dict[str, str]:
 
 def run_tests(root: Path, cmd: str, timeout: int) -> tuple[TestStatus, str]:
     """Run `cmd` (split like a shell would, but no shell) in `root`. (status, detail)."""
+    env = scrubbed_env()
     try:
+        argv = shlex.split(cmd)
+        # Resolved up front: a directory named like the command on PATH (CodeQL ships one
+        # called `python`) otherwise fails as a baffling "Permission denied".
+        exe = argv[0] if argv and "/" in argv[0] else None  # a path: relative to root
+        if argv and exe is None:
+            exe = shutil.which(argv[0], path=env.get("PATH"))
+        if exe is None:
+            return TestStatus.error, f"`{cmd}` could not run: {argv[:1]} not found on PATH"
         proc = subprocess.run(
-            shlex.split(cmd),
+            [exe, *argv[1:]],
             cwd=root,
             stdin=subprocess.DEVNULL,
             capture_output=True,
             text=True,
             timeout=timeout,
-            env=scrubbed_env(),
+            env=env,
         )
     except subprocess.TimeoutExpired:
         return TestStatus.timeout, f"`{cmd}` gave no result after {timeout}s"

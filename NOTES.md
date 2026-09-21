@@ -344,9 +344,32 @@ restored and the Fixer is called again with the reason, up to `max_fix_rounds` F
     round limit, with `new_finding_introduced` ×2 and `round_limit_hit` flags
     (`test_graph.py::test_new_finding_is_retried_then_escalated_at_the_round_limit`).
 
+Real run (`repo_small`, run `20260921-214938-bcba74`): **$0.0385**, 78.5 s, 19.3k→2.4k
+tokens, 19 LLM calls (9 Triage, 6 Fixer including one retry, 4 Verifier). Ruff fixed 6, 4
+suggested, 5 escalated, exit 1. Flags: `round_limit_hit` ×1, `triage_policy_disagreement` ×1.
+- **The baseline tests errored**, outside the sandbox too: a CodeQL install puts a *directory*
+  called `python` on PATH, and there is no `python` binary. `exec` then fails with
+  `Permission denied`. The run did what it should (warning, Fixer changes only suggested), but
+  the message was baffling. `run_tests` now resolves the command with `shutil.which` first
+  (which skips directories) and says "not found on PATH". A real auto-fix path still needs a
+  run with a working `python` (~$0.04).
+- **A real failure for M7:** SIM103 and E711 are both on `utils.py:7` (`if value == None:`).
+  E711 ran first, but with no tests its fix was only a suggestion, so the file kept `== None`.
+  The SIM103 fix (`return value is None`) then also fixed E711, and `also_resolved` rejected
+  it twice → escalated at the round limit. With working tests E711 is kept first and SIM103
+  sees the refreshed snippet. The rule is right for "don't quietly fix a nearby security
+  finding", but too strict for two findings on the *same line* with auto-fixable rules.
+  Candidate fix: allow `also_resolved` when the other finding overlaps the target's lines and
+  its pre-class isn't escalate/protected.
+- The Verifier rated B006 (mutable default → `None` sentinel) *med* risk and the rest *low*,
+  which is right: B006's fix changes behaviour for callers that relied on the shared list.
+- Triage suggested F401 in `app/auth/` and policy raised it to escalate (protected path), the
+  one disagreement flag. Triage's escalation reasons for the bandit findings are good enough
+  to paste into a PR comment.
+- Latency is almost all the LLM: ~2.5 s per Sonnet call, 2–20 s per DeepSeek Triage call
+  (one took 19.6 s).
+
 Open:
-- Real run not done yet. Estimate for `repo_small`: ~$0.04, the M3 cost plus 5 Sonnet Verifier
-  calls.
 - M5: set `persist-credentials: false` on checkout, so a PR's test_command can't read the
   token from `.git/config`. Removing it from the environment isn't enough.
 - Findings in files ruff fixed are reported at post-ruff line numbers, while ruff's own fixed

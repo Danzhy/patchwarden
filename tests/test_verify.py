@@ -20,8 +20,19 @@ def test_run_tests_statuses(tmp_path):
     status, detail = run_tests(tmp_path, f"{PY} -c \"print('boom'); raise SystemExit(3)\"", 30)
     assert status == TestStatus.failed and "exited 3" in detail and "boom" in detail
     assert run_tests(tmp_path, f'{PY} -c "import time; time.sleep(5)"', 1)[0] == TestStatus.timeout
-    assert run_tests(tmp_path, "no-such-binary-xyz", 5)[0] == TestStatus.error
+    assert run_tests(tmp_path, "no-such-binary-xyz", 5) == (
+        TestStatus.error,
+        "`no-such-binary-xyz` could not run: ['no-such-binary-xyz'] not found on PATH",
+    )
+    assert run_tests(tmp_path, "", 5)[0] == TestStatus.error
     assert run_tests(tmp_path, 'unclosed "quote', 5)[0] == TestStatus.error
+
+
+def test_a_directory_on_path_is_not_the_command(tmp_path, monkeypatch):
+    (tmp_path / "bin/python").mkdir(parents=True)  # like CodeQL's tools dir
+    monkeypatch.setenv("PATH", str(tmp_path / "bin"))
+    status, detail = run_tests(tmp_path, "python -m pytest", 5)
+    assert status == TestStatus.error and "not found on PATH" in detail
 
 
 def test_tests_get_no_secrets(tmp_path, monkeypatch):
