@@ -1,0 +1,53 @@
+{
+ "note": "Benchmark A2 repos (pure Python, fast pytest suites). Pinned 2026-09-21.",
+ "repos": [
+  {
+   "repo": "more-itertools/more-itertools",
+   "branch": "master",
+   "sha": "b5e3886a37209bb880f17d82fbf4ba00ece0e41e",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "pytoolz/toolz",
+   "branch": "master",
+   "sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "mahmoud/boltons",
+   "branch": "master",
+   "sha": "961dcff3f42e73b245aef65e377fe82763b257bb",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "python-humanize/humanize",
+   "branch": "main",
+   "sha": "392aef707c0e74341ab4a51420984e9ea6b566c5",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "tkem/cachetools",
+   "branch": "master",
+   "sha": "3c082c654c2804b9354e4b62dbd2994f1aac464d",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "astanin/python-tabulate",
+   "branch": "master",
+   "sha": "268615a5c27dc40e5c22454c07b44d5c50410da0",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "marshmallow-code/marshmallow",
+   "branch": "dev",
+   "sha": "7f0792bd7a06f72e393ec866ac1e89e1502ccfe1",
+   "test_command": "python -m pytest -q -x"
+  },
+  {
+   "repo": "jd/tenacity",
+   "branch": "main",
+   "sha": "3e58094d3bc414975aad9eadf343a32bdb3b89b3",
+   "test_command": "python -m pytest -q -x"
+  }
+ ]
+}

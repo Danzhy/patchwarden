@@ -1,0 +1,747 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/auth/tokens.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 1,
+                        "endLine": 3,
+                        "startColumn": 1,
+                        "startLine": 2
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Remove unused import: `json`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/auth/tokens.py"
+                },
+                "region": {
+                  "endColumn": 12,
+                  "endLine": 2,
+                  "startColumn": 8,
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "`json` imported but unused"
+          },
+          "ruleId": "F401"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/shapes.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 21,
+                        "endLine": 1,
+                        "startColumn": 13,
+                        "startLine": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Remove `object` inheritance"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/shapes.py"
+                },
+                "region": {
+                  "endColumn": 20,
+                  "endLine": 1,
+                  "startColumn": 14,
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Class `Square` inherits from `object`"
+          },
+          "ruleId": "UP004"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/shapes.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 55,
+                        "endLine": 9,
+                        "startColumn": 16,
+                        "startLine": 9
+                      },
+                      "insertedContent": {
+                        "text": "f\"Square with side {self.side}\""
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Convert to f-string"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/shapes.py"
+                },
+                "region": {
+                  "endColumn": 55,
+                  "endLine": 9,
+                  "startColumn": 16,
+                  "startLine": 9
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Use f-string instead of `format` call"
+          },
+          "ruleId": "UP032"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/shapes.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 21,
+                        "endLine": 16,
+                        "startColumn": 5,
+                        "startLine": 13
+                      },
+                      "insertedContent": {
+                        "text": "return sq.area() > 100"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Replace with `return sq.area() > 100`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/shapes.py"
+                },
+                "region": {
+                  "endColumn": 21,
+                  "endLine": 16,
+                  "startColumn": 5,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Return the condition `sq.area() > 100` directly"
+          },
+          "ruleId": "SIM103"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 1,
+                        "endLine": 2,
+                        "startColumn": 1,
+                        "startLine": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Remove unused import: `os`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 10,
+                  "endLine": 1,
+                  "startColumn": 8,
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "`os` imported but unused"
+          },
+          "ruleId": "F401"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 1,
+                        "endLine": 3,
+                        "startColumn": 1,
+                        "startLine": 2
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Remove unused import: `sys`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 11,
+                  "endLine": 2,
+                  "startColumn": 8,
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "`sys` imported but unused"
+          },
+          "ruleId": "F401"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 24,
+                  "endLine": 3,
+                  "startColumn": 1,
+                  "startLine": 3
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "`typing.List` is deprecated, use `list` instead"
+          },
+          "ruleId": "UP035"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 22,
+                        "endLine": 6,
+                        "startColumn": 18,
+                        "startLine": 6
+                      },
+                      "insertedContent": {
+                        "text": "list"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Replace with `list`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 22,
+                  "endLine": 6,
+                  "startColumn": 18,
+                  "startLine": 6
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Use `list` instead of `List` for type annotation"
+          },
+          "ruleId": "UP006"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 1,
+                        "endLine": 8,
+                        "startColumn": 1,
+                        "startLine": 7
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Remove assignment to unused variable `unused`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 11,
+                  "endLine": 7,
+                  "startColumn": 5,
+                  "startLine": 7
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Local variable `unused` is assigned to but never used"
+          },
+          "ruleId": "F841"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 17,
+                        "endLine": 14,
+                        "startColumn": 5,
+                        "startLine": 12
+                      },
+                      "insertedContent": {
+                        "text": "return value == None"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Replace with `return value == None`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 17,
+                  "endLine": 14,
+                  "startColumn": 5,
+                  "startLine": 12
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Return the condition `value == None` directly"
+          },
+          "ruleId": "SIM103"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 21,
+                        "endLine": 12,
+                        "startColumn": 8,
+                        "startLine": 12
+                      },
+                      "insertedContent": {
+                        "text": "value is None"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Replace with `cond is None`"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 21,
+                  "endLine": 12,
+                  "startColumn": 17,
+                  "startLine": 12
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Comparison to `None` should be `cond is None`"
+          },
+          "ruleId": "E711"
+        },
+        {
+          "fixes": [
+            {
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "app/utils.py"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "endColumn": 32,
+                        "endLine": 17,
+                        "startColumn": 30,
+                        "startLine": 17
+                      },
+                      "insertedContent": {
+                        "text": "None"
+                      }
+                    },
+                    {
+                      "deletedRegion": {
+                        "endColumn": 1,
+                        "endLine": 18,
+                        "startColumn": 1,
+                        "startLine": 18
+                      },
+                      "insertedContent": {
+                        "text": "    if bucket is None:\n        bucket = []\n"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "description": {
+                "text": "Replace with `None`; initialize within function"
+              }
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/utils.py"
+                },
+                "region": {
+                  "endColumn": 32,
+                  "endLine": 17,
+                  "startColumn": 30,
+                  "startLine": 17
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Do not use mutable data structures for argument defaults"
+          },
+          "ruleId": "B006"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/astral-sh/ruff",
+          "name": "ruff",
+          "rules": [
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for uses of mutable objects as function argument defaults.\n\n## Why is this bad?\nFunction defaults are evaluated once, when the function is defined.\n\nThe same mutable object is then shared across all calls to the function.\nIf the object is modified, those modifications will persist across calls,\nwhich can lead to unexpected behavior.\n\nInstead, prefer to use immutable data structures, or take `None` as a\ndefault, and initialize a new mutable object inside the function body\nfor each call.\n\nArguments with immutable type annotations will be ignored by this rule.\nTypes outside of the standard library can be marked as immutable with the\n[`lint.flake8-bugbear.extend-immutable-calls`] configuration option.\n\n## Known problems\nMutable argument defaults can be used intentionally to cache computation\nresults. Replacing the default with `None` or an immutable data structure\ndoes not work for such usages. Instead, prefer the `@functools.lru_cache`\ndecorator from the standard library.\n\n## Example\n```python\ndef add_to_list(item, some_list=[]):\n    some_list.append(item)\n    return some_list\n\n\nl1 = add_to_list(0)  # [0]\nl2 = add_to_list(1)  # [0, 1]\n```\n\nUse instead:\n```python\ndef add_to_list(item, some_list=None):\n    if some_list is None:\n        some_list = []\n    some_list.append(item)\n    return some_list\n\n\nl1 = add_to_list(0)  # [0]\nl2 = add_to_list(1)  # [1]\n```\n\n## Options\n- `lint.flake8-bugbear.extend-immutable-calls`\n\n## Fix safety\n\nThis fix is marked as unsafe because it replaces the mutable default with `None`\nand initializes it in the function body, which may not be what the user intended,\nas described above.\n\n## References\n- [Python documentation: Default Argument Values](https://docs.python.org/3/tutorial/controlflow.html#default-argument-values)\n"
+              },
+              "help": {
+                "text": "Do not use mutable data structures for argument defaults"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/mutable-argument-default",
+              "id": "B006",
+              "properties": {
+                "id": "B006",
+                "kind": "flake8-bugbear",
+                "name": "mutable-argument-default",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Do not use mutable data structures for argument defaults"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for comparisons to `None` which are not using the `is` operator.\n\n## Why is this bad?\nAccording to [PEP 8], \"Comparisons to singletons like None should always be done with\n`is` or `is not`, never the equality operators.\"\n\n## Example\n```python\nif arg != None:\n    pass\nif None == arg:\n    pass\n```\n\nUse instead:\n```python\nif arg is not None:\n    pass\n```\n\n## Fix safety\n\nThis rule's fix is marked as unsafe, as it may alter runtime behavior when\nused with libraries that override the `==`/`__eq__` or `!=`/`__ne__` operators.\nIn these cases, `is`/`is not` may not be equivalent to `==`/`!=`. For more\ninformation, see [this issue].\n\n[PEP 8]: https://peps.python.org/pep-0008/#programming-recommendations\n[this issue]: https://github.com/astral-sh/ruff/issues/4560\n"
+              },
+              "help": {
+                "text": "Comparison to `None` should be `cond is None`"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/none-comparison",
+              "id": "E711",
+              "properties": {
+                "id": "E711",
+                "kind": "pycodestyle",
+                "name": "none-comparison",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Comparison to `None` should be `cond is None`"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for unused imports.\n\n## Why is this bad?\nUnused imports add a performance overhead at runtime, and risk creating\nimport cycles. They also increase the cognitive load of reading the code.\n\nIf an import statement is used to check for the availability or existence\nof a module, consider using `importlib.util.find_spec` instead.\n\nIf an import statement is used to re-export a symbol as part of a module's\npublic interface, consider using a \"redundant\" import alias, which\ninstructs Ruff (and other tools) to respect the re-export, and avoid\nmarking it as unused, as in:\n\n```python\nfrom module import member as member\n```\n\nAlternatively, you can use `__all__` to declare a symbol as part of the module's\ninterface, as in:\n\n```python\n# __init__.py\nimport some_module\n\n__all__ = [\"some_module\"]\n```\n\n## Preview\nWhen [preview] is enabled (and certain simplifying assumptions\nare met), we analyze all import statements for a given module\nwhen determining whether an import is used, rather than simply\nthe last of these statements. This can result in both different and\nmore import statements being marked as unused.\n\nFor example, if a module consists of\n\n```python\nimport a\nimport a.b\n```\n\nthen both statements are marked as unused under [preview], whereas\nonly the second is marked as unused under stable behavior.\n\nAs another example, if a module consists of\n\n```python\nimport a.b\nimport a\n\na.b.foo()\n```\n\nthen a diagnostic will be emitted for the second line under [preview],\nwhereas no diagnostic is emitted under stable behavior.\n\nNote that this behavior is somewhat subjective and is designed\nto conform to the developer's intuition rather than Python's actual\nexecution. To wit, the statement `import a.b` automatically executes\n`import a`, so in some sense `import a` is _always_ redundant\nin the presence of `import a.b`.\n\n\n## Fix safety\n\nFixes to remove unused imports are safe, except in `__init__.py` files.\n\nApplying fixes to `__init__.py` files is currently in preview. The fix offered depends on the\ntype of the unused import. Ruff will suggest a safe fix to export first-party imports with\neither a redundant alias or, if already present in the file, an `__all__` entry. If multiple\n`__all__` declarations are present, Ruff will not offer a fix. Ruff will suggest an unsafe fix\nto remove third-party and standard library imports -- the fix is unsafe because the module's\ninterface changes.\n\nSee [this FAQ section](https://docs.astral.sh/ruff/faq/#how-does-ruff-determine-which-of-my-imports-are-first-party-third-party-etc)\nfor more details on how Ruff\ndetermines whether an import is first or third-party.\n\n## Example\n\n```python\nimport numpy as np  # unused import\n\n\ndef area(radius):\n    return 3.14 * radius**2\n```\n\nUse instead:\n\n```python\ndef area(radius):\n    return 3.14 * radius**2\n```\n\nTo check the availability of a module, use `importlib.util.find_spec`:\n\n```python\nfrom importlib.util import find_spec\n\nif find_spec(\"numpy\") is not None:\n    print(\"numpy is installed\")\nelse:\n    print(\"numpy is not installed\")\n```\n\n## Options\n- `lint.ignore-init-module-imports`\n- `lint.pyflakes.allowed-unused-imports`\n\n## References\n- [Python documentation: `import`](https://docs.python.org/3/reference/simple_stmts.html#the-import-statement)\n- [Python documentation: `importlib.util.find_spec`](https://docs.python.org/3/library/importlib.html#importlib.util.find_spec)\n- [Typing documentation: interface conventions](https://typing.python.org/en/latest/spec/distributing.html#library-interface-public-and-private-symbols)\n\n[preview]: https://docs.astral.sh/ruff/preview/\n"
+              },
+              "help": {
+                "text": "`{name}` imported but unused; consider using `importlib.util.find_spec` to test for availability"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/unused-import",
+              "id": "F401",
+              "properties": {
+                "id": "F401",
+                "kind": "Pyflakes",
+                "name": "unused-import",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "`{name}` imported but unused; consider using `importlib.util.find_spec` to test for availability"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for the presence of unused variables in function scopes.\n\n## Why is this bad?\nA variable that is defined but not used is likely a mistake, and should\nbe removed to avoid confusion.\n\nIf a variable is intentionally defined-but-not-used, it should be\nprefixed with an underscore, or some other value that adheres to the\n[`lint.dummy-variable-rgx`] pattern.\n\n## Example\n```python\ndef foo():\n    x = 1\n    y = 2\n    return x\n```\n\nUse instead:\n```python\ndef foo():\n    x = 1\n    return x\n```\n\n## Fix safety\n\nThis rule's fix is marked as unsafe because removing an unused variable assignment may\ndelete comments that are attached to the assignment.\n\n## See also\n\nThis rule does not apply to bindings in unpacked assignments (e.g. `x, y = 1, 2`). See\n[`unused-unpacked-variable`][RUF059] for this case.\n\n## Options\n- `lint.dummy-variable-rgx`\n\n[RUF059]: https://docs.astral.sh/ruff/rules/unused-unpacked-variable/\n"
+              },
+              "help": {
+                "text": "Local variable `{name}` is assigned to but never used"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/unused-variable",
+              "id": "F841",
+              "properties": {
+                "id": "F841",
+                "kind": "Pyflakes",
+                "name": "unused-variable",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Local variable `{name}` is assigned to but never used"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for `if` statements that can be replaced with `bool`.\n\n## Why is this bad?\n`if` statements that return `True` for a truthy condition and `False` for\na falsy condition can be replaced with boolean casts.\n\n## Example\nGiven:\n```python\ndef foo(x: int) -> bool:\n    if x > 0:\n        return True\n    else:\n        return False\n```\n\nUse instead:\n```python\ndef foo(x: int) -> bool:\n    return x > 0\n```\n\nOr, given:\n```python\ndef foo(x: int) -> bool:\n    if x > 0:\n        return True\n    return False\n```\n\nUse instead:\n```python\ndef foo(x: int) -> bool:\n    return x > 0\n```\n\n## Fix safety\n\nThis fix is marked as unsafe because it may change the program\u2019s behavior if the condition does not\nreturn a proper Boolean. While the fix will try to wrap non-boolean values in a call to bool,\ncustom implementations of comparison functions like `__eq__` can avoid the bool call and still\nlead to altered behavior.\n\n## References\n- [Python documentation: Truth Value Testing](https://docs.python.org/3/library/stdtypes.html#truth-value-testing)\n"
+              },
+              "help": {
+                "text": "Return the condition `{condition}` directly"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/needless-bool",
+              "id": "SIM103",
+              "properties": {
+                "id": "SIM103",
+                "kind": "flake8-simplify",
+                "name": "needless-bool",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Return the condition `{condition}` directly"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for classes that inherit from `object`.\n\n## Why is this bad?\nSince Python 3, all classes inherit from `object` by default, so `object` can\nbe omitted from the list of base classes.\n\n## Example\n\n```python\nclass Foo(object): ...\n```\n\nUse instead:\n\n```python\nclass Foo: ...\n```\n\n## Fix safety\nThis fix is unsafe if it would cause comments to be deleted.\n\n## References\n- [PEP 3115 \u2013 Metaclasses in Python 3000](https://peps.python.org/pep-3115/)\n"
+              },
+              "help": {
+                "text": "Class `{name}` inherits from `object`"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/useless-object-inheritance",
+              "id": "UP004",
+              "properties": {
+                "id": "UP004",
+                "kind": "pyupgrade",
+                "name": "useless-object-inheritance",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Class `{name}` inherits from `object`"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for the use of generics that can be replaced with standard library\nvariants based on [PEP 585].\n\n## Why is this bad?\n[PEP 585] enabled collections in the Python standard library (like `list`)\nto be used as generics directly, instead of importing analogous members\nfrom the `typing` module (like `typing.List`).\n\nWhen available, the [PEP 585] syntax should be used instead of importing\nmembers from the `typing` module, as it's more concise and readable.\nImporting those members from `typing` is considered deprecated as of [PEP\n585].\n\nThis rule is enabled when targeting Python 3.9 or later (see:\n[`target-version`]). By default, it's _also_ enabled for earlier Python\nversions if `from __future__ import annotations` is present, as\n`__future__` annotations are not evaluated at runtime. If your code relies\non runtime type annotations (either directly or via a library like\nPydantic), you can disable this behavior for Python versions prior to 3.9\nby setting [`lint.pyupgrade.keep-runtime-typing`] to `true`.\n\n## Example\n```python\nfrom typing import List\n\nfoo: List[int] = [1, 2, 3]\n```\n\nUse instead:\n```python\nfoo: list[int] = [1, 2, 3]\n```\n\n## Fix safety\nThis rule's fix is marked as unsafe, as it may lead to runtime errors when\nalongside libraries that rely on runtime type annotations, like Pydantic,\non Python versions prior to Python 3.9.\n\nIn [preview], this rule can also add its own `__future__` import on Python\n3.9 and earlier, if the [`lint.future-annotations`] setting is enabled. This\nalso makes the fix unsafe.\n\n## Options\n- `target-version`\n- `lint.pyupgrade.keep-runtime-typing`\n- `lint.future-annotations`\n\n[PEP 585]: https://peps.python.org/pep-0585/\n[preview]: https://docs.astral.sh/ruff/preview/\n"
+              },
+              "help": {
+                "text": "Use `{to}` instead of `{from}` for type annotation"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/non-pep585-annotation",
+              "id": "UP006",
+              "properties": {
+                "id": "UP006",
+                "kind": "pyupgrade",
+                "name": "non-pep585-annotation",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Use `{to}` instead of `{from}` for type annotation"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for `str.format` calls that can be replaced with f-strings.\n\n## Why is this bad?\nf-strings are more readable and generally preferred over `str.format`\ncalls.\n\n## Example\n```python\n\"{}\".format(foo)\n```\n\nUse instead:\n```python\nf\"{foo}\"\n```\n\n## References\n- [Python documentation: f-strings](https://docs.python.org/3/reference/lexical_analysis.html#f-strings)\n"
+              },
+              "help": {
+                "text": "Use f-string instead of `format` call"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/f-string",
+              "id": "UP032",
+              "properties": {
+                "id": "UP032",
+                "kind": "pyupgrade",
+                "name": "f-string",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Use f-string instead of `format` call"
+              }
+            },
+            {
+              "fullDescription": {
+                "text": "## What it does\nChecks for uses of deprecated imports based on the minimum supported\nPython version.\n\n## Why is this bad?\nDeprecated imports may be removed in future versions of Python, and\nshould be replaced with their new equivalents.\n\nNote that, in some cases, it may be preferable to continue importing\nmembers from `typing_extensions` even after they're added to the Python\nstandard library, as `typing_extensions` can backport bugfixes and\noptimizations from later Python versions. This rule thus avoids flagging\nimports from `typing_extensions` in such cases.\n\n## Example\n```python\nfrom collections import Sequence\n```\n\nUse instead:\n```python\nfrom collections.abc import Sequence\n```\n"
+              },
+              "help": {
+                "text": "Import from `{target}` instead: {names}"
+              },
+              "helpUri": "https://docs.astral.sh/ruff/rules/deprecated-import",
+              "id": "UP035",
+              "properties": {
+                "id": "UP035",
+                "kind": "pyupgrade",
+                "name": "deprecated-import",
+                "problem.severity": "error"
+              },
+              "shortDescription": {
+                "text": "Import from `{target}` instead: {names}"
+              }
+            }
+          ],
+          "version": "0.16.8"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

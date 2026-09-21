@@ -1,0 +1,2986 @@
+{
+ "source": "huggingface:thepurpleowl/codequeries file_ideal test (Apache-2.0)",
+ "seed": 20260921,
+ "max_files_per_rule": 20,
+ "max_file_lines": 400,
+ "items": [
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "ImageEngine/gaffer/python/GafferUITest/EventSignalCombinerTest.py",
+   "sha256": "a85522875736669e04e2471afbbe4f67dc1159e0b8ab450f5a97d956a6975a6f",
+   "answer_lines": [
+    41,
+    43
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "Opentaste/bombolone/bombolone/api/hash_table.py",
+   "sha256": "7c3e83cbe087f70e414fff711c819fc33bf7f768827d66413beb2e35c9cdd8e0",
+   "answer_lines": [
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "dropbox/nsot/tests/fixtures.py",
+   "sha256": "bf5f32e47c41afe61750b6d0b3f8be3a7f5b66dee15bd23c9c660ef12141b4a7",
+   "answer_lines": [
+    7,
+    8,
+    10,
+    11,
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "calebsmith/django-template-debug/example/urls.py",
+   "sha256": "1cd67c0f5b70bd173ac7b23a482a555c91e25807c0e410b667e910e743e22a20",
+   "answer_lines": [
+    2,
+    4
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "ooici/elasticpy/elasticpy/connection.py",
+   "sha256": "6b173719dbaeee3d15ed3779ebdeded625f807f3122074346127a4b9f8ebcf26",
+   "answer_lines": [
+    14
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "m-lab/operator/plsync/sites.py",
+   "sha256": "f34604dff79e6ce07b0de1268cc3619368f79e53231e4b7a9c183f95f2682b3e",
+   "answer_lines": [
+    3
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "behave/behave/features/steps/use_steplib_behave4cmd.py",
+   "sha256": "36ffbadabfa5a80f23e84f8646df8a716b943582c92009d055ff519be4562d22",
+   "answer_lines": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "viewfinderco/viewfinder/backend/db/test/device_test.py",
+   "sha256": "ac7e41e567256c2363e9ff3fb5ee541b743d34badedbcda1bc9b88efdde24ce3",
+   "answer_lines": [
+    9,
+    13
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "datastax/python-driver/tests/integration/long/__init__.py",
+   "sha256": "8dc1795c81b94af4a9ec23cce1766a4b560d28e1aa6c2ab05ac7d4f7ba581825",
+   "answer_lines": [
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "cloudera/hue/desktop/core/ext-py/pycparser-2.14/examples/func_calls.py",
+   "sha256": "d7fd44e8de553ca51316fad14ba443bf8772ef1d3cd9dcf1cbd77478c735c0a1",
+   "answer_lines": [
+    17
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "tailhook/pyzza/backport/fix_class.py",
+   "sha256": "3f96fdb6f6cd562c9bc6d55cb391960b7a07fd1b25ee7e2aa862da1d06a6611a",
+   "answer_lines": [
+    2,
+    3
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "projectatomic/atomic-reactor/tests/test_tasker.py",
+   "sha256": "9d51a34cfe3d1e20fc11f9c39d968adf8c61e8620a5b4714064b7c2f24367b4d",
+   "answer_lines": [
+    11
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "GoogleCloudPlatform/python-compat-runtime/appengine-compat/exported_appengine_sdk/google/appengine/datastore/datastore_pb.py",
+   "sha256": "0a15c1137626ca9f64f9185c8d64f5354896503aa1ffa9ae2722cd137d13811b",
+   "answer_lines": [
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    41,
+    42,
+    43,
+    44
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "AppScale/appscale/AppServer/lib/django-1.2/django/contrib/admin/validation.py",
+   "sha256": "fe2acb08bbc9814ddc3393a7e62677e7989a9dfaccca066aab4be7d027a6c813",
+   "answer_lines": [
+    7
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "enthought/envisage/examples/plugins/workbench/AcmeLab/acme/workbench/action/new_view_action.py",
+   "sha256": "308e313eecea45eb0a460673889592ccb44d40787246ed8ec4d5f3e3f2b7a329",
+   "answer_lines": [
+    5
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "mikrosimage/OpenRenderManagement/src/octopus/dispatcher/poolman/wspoolman.py",
+   "sha256": "8c4c7ab5395fcb7cd0e9094e2d1753e8b5ece15e3900893ef27459b7fd6327a4",
+   "answer_lines": [
+    15
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "AppScale/appscale/AppServer/lib/django-1.2/tests/modeltests/model_package/models/__init__.py",
+   "sha256": "f6aced76fc0cb98e5f395834e7bf4ee66fad1427923e6da53c42d40358f1eeb8",
+   "answer_lines": [
+    2,
+    3
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "CountZer0/PipelineConstructionSet/python/maya/site-packages/pymel-1.0.3/pymel/internal/pwarnings.py",
+   "sha256": "633d327c199589eeebffb634349a7626db5983da8f6282c8c85042a0e17fa104",
+   "answer_lines": [
+    8
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "scipy/scipy/doc/source/scipyoptdoc.py",
+   "sha256": "9312d5a3fc7fb522258d002e0aa015da1a85723ec3a355184325bf11f1efea84",
+   "answer_lines": [
+    25,
+    28,
+    35
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused import",
+   "codeql_id": "py/unused-import",
+   "query_path": "Imports/UnusedImport.ql",
+   "code_file_path": "chibisov/drf-extensions/tests_app/tests/functional/permissions/extended_django_object_permissions/tests.py",
+   "sha256": "389c8b935fc4bf04b70d64adeced1fb839ab1b82bba521abade4df3584f9e979",
+   "answer_lines": [
+    5
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "CGATOxford/cgat/CGAT/Glam2Scan.py",
+   "sha256": "5ac682dbb7cf7ac04d383febe411b80aa88bc7efcd31b0aadb1fd5577e6e329e",
+   "answer_lines": [
+    63
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "rcaloras/bashhub-client/bashhub/bashhub.py",
+   "sha256": "099478ec6d65e7f36e5b3be687e7ba79cfde7787a1837b688db6b9610f010f72",
+   "answer_lines": [
+    176
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "ooici/pyon/pyon/agent/simple_agent.py",
+   "sha256": "2d29faf30d2364fd708d7c989b50991bac978b699b1c782798e13cb39c4599c9",
+   "answer_lines": [
+    113
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "spranesh/Redhawk/redhawk/scripts/add.py",
+   "sha256": "a689ea6a681438c93749f3615ef95e29b84a5ccf1257952ea18657d4ff85e971",
+   "answer_lines": [
+    29
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "lukesneeringer/django-pgfields/tests/composite/tests.py",
+   "sha256": "367a776c573179d8669cfe11804f3620e8e7c1a1386c4a49ddce4596a4a74947",
+   "answer_lines": [
+    97,
+    104,
+    116
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "codalab/codalab-cli/codalab/rest/example.py",
+   "sha256": "86b439f0a63b4e465dc193599d95bb011f66e7a5a9920ed85fdafe99f9cc37b5",
+   "answer_lines": [
+    22
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "charanpald/APGL/apgl/graph/test/GraphUtilsTest.py",
+   "sha256": "ca06f0ce7ff0692f0ef151eb9eaf38788cca480bb935a05ee86e23fa9e3d2270",
+   "answer_lines": [
+    184,
+    207,
+    238
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "appcelerator-archive/poc-nodejs-desktop/Resources/nodejs/builds/linux/node/lib/node/wafadmin/Tools/unittestw.py",
+   "sha256": "22d5ce7aeaaa6918cee66812e1210ddbde3b784cd335911ba885ae6b39e3d824",
+   "answer_lines": [
+    162,
+    229
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "gosquadron/squadron/tests/notify/test_notify.py",
+   "sha256": "9bfec56d55023538b188eaec849c99b3198a60638565cd40d4ee6ff735970768",
+   "answer_lines": [
+    40
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "ioflo/ioflo/ioflo/aio/proto/packeting.py",
+   "sha256": "5dfa5f1b7320fb3f3558f9320de4e04ac1512e79bcb80050280f0dcd6d48c3c5",
+   "answer_lines": [
+    130,
+    206
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "mcroydon/django-tumbleweed/tumbleweed/views.py",
+   "sha256": "49ddd625c18ee79da629fbd99601ad6c061dc9ffbfdef51ca00a39d282d5a4b9",
+   "answer_lines": [
+    208
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "google/simian/src/simian/mac/cron/maintenance.py",
+   "sha256": "f29e720d909c7a8b7cc2a0b0e3d729c36bf3bbfe6b908cdc1c71f928f6724bd0",
+   "answer_lines": [
+    43,
+    54
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "aldebaran/qibuild/python/qitoolchain/test/test_toolchain.py",
+   "sha256": "84306187991b854d31d36c79408f70162423dd3cde9bfbbfa4adac414b537b24",
+   "answer_lines": [
+    24
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "Blazemeter/taurus/tests/modules/test_consolidatingAggregator.py",
+   "sha256": "03e26d59df28524cb917bcf7d9ac9f5f26f842bd692788d7d0df78976e9cddbf",
+   "answer_lines": [
+    17
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "PythonCharmers/python-future/src/libfuturize/fixes/fix_metaclass.py",
+   "sha256": "18b07beb06eec9455c883816f5b80d34e0449cb792fc047e7ca00170f05993a3",
+   "answer_lines": [
+    80
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "lisa-lab/pylearn2/pylearn2/dataset_get/dataset_resolver.py",
+   "sha256": "a3f9ba88180fd4518ba759e67d0c98bef424109d39c8fc6631a024940a98588b",
+   "answer_lines": [
+    53
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "radlab/sparrow/src/main/python/get_response_time.py",
+   "sha256": "2d924e8a0ef73e50ffaf44a23ba3e1e17316c1df6ff29cd76db16d11552279e8",
+   "answer_lines": [
+    49
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "AppScale/appscale/AppServer/lib/django-1.5/django/forms/formsets.py",
+   "sha256": "27e591b0522821915f7d4607a6d4b053fac7bcad57326b106a5f66f360c33335",
+   "answer_lines": [
+    277
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "glue-viz/glue/glue/core/tests/test_component_link.py",
+   "sha256": "d693e4d279132ee1cab26e691a3317436a20df27eae9bee4cdcd8bc32392adcf",
+   "answer_lines": [
+    28
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unused local variable",
+   "codeql_id": "py/unused-local-variable",
+   "query_path": "Variables/UnusedLocalVariable.ql",
+   "code_file_path": "EducationalTestingService/skll/tests/test_cv.py",
+   "sha256": "d2d71787959b3a8655afbfa7414a5abd8e46520e9bfd3fc4ace7d53cd40881ca",
+   "answer_lines": [
+    67,
+    256
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "ProgVal/Limnoria/plugins/GPG/config.py",
+   "sha256": "e22d0d764f8df2f281a059e7b4b00b959ccd9ae8f3dc62fead574dcc90d8874b",
+   "answer_lines": [
+    36
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "miguelgrinberg/Flask-HTTPAuth/examples/multi_auth.py",
+   "sha256": "d6219ba33e575b1e5a0ae212389b1c8b7371117c94ecc7bc94a3af4970d18fb7",
+   "answer_lines": [
+    50
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "Bookworm-project/BookwormDB/bookwormDB/wordcounter.py",
+   "sha256": "dc2c38c2405c10ab783e18415577fb0b05f96d7228b8e189f7edb0acb698fa3b",
+   "answer_lines": [
+    152
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "sarumont/py-trello/trello/board.py",
+   "sha256": "0f8544a869b5dbd620b84a337f72a679a496a72d49796798c5658a05f3a614c5",
+   "answer_lines": [
+    65
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "kuri65536/python-for-android/python-modules/twisted/twisted/spread/util.py",
+   "sha256": "e55db3d60b3468b578f429baeda1ad423ec1d040d24b7a1f74a16b255827ab62",
+   "answer_lines": [
+    50
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "NervanaSystems/neon/setup.py",
+   "sha256": "d52fa6a93497346b0425f090549c60fa9347f554252b93ff0907d3c31ad52a82",
+   "answer_lines": [
+    32
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "facebook/chisel/commands/FBFindCommands.py",
+   "sha256": "b8285416b3d7f0c9abbc7eeff63d610e2b05a08c7bf633b5c2a28cad783703b2",
+   "answer_lines": [
+    75
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "chaosmail/python-fs/fs/fs.py",
+   "sha256": "7d358c31b6a4390f3cb589e52cc94c81b664d8fdbfdeb57d50f7ddb22cc12a6d",
+   "answer_lines": [
+    255,
+    265
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "godaddy/Thespian/thespian/test/helpers.py",
+   "sha256": "046555d71e1667620154194ecd510e85f5478968e1e6d8993c88d643a85c90d4",
+   "answer_lines": [
+    85
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "aerospike/aerospike-client-python/test/new_tests/test_list_get.py",
+   "sha256": "6702d0884bb1c5fc6964522b5bb9f468dafdd7ece64ffd6e46a08d07c2b38ac5",
+   "answer_lines": [
+    11
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "statsmodels/statsmodels/statsmodels/graphics/tests/test_boxplots.py",
+   "sha256": "cfe19385843e1c43946ef71cbd36e157e00e7f2cd867e607a24a2aa50614fab0",
+   "answer_lines": [
+    11
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "lambdalisue/django-permission/src/permission/utils/autodiscover.py",
+   "sha256": "c118027c9789514dd1b50de298ca1e1e89ece4d02b73572897c251faa1100ce7",
+   "answer_lines": [
+    24
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "OpenMOOC/askbot-openmooc/askbotopenmooc/utils/openmooc-askbot-instancetool.py",
+   "sha256": "d1cb30050f80a1e0fa3093e88c53e8ba8e28a6778e2abaca6eca26d9971d2299",
+   "answer_lines": [
+    125,
+    148,
+    191,
+    212,
+    241,
+    262,
+    275,
+    287
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "sahana/eden/modules/s3/sync_adapter/ftp.py",
+   "sha256": "7b01032bb79edb9779b95aece662584b5fe145156543ea6212681d7095b6db90",
+   "answer_lines": [
+    42
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "steveniemitz/scales/test/integration/thrift/test_thrift.py",
+   "sha256": "8075398a565fe12c744fd5027f20e54d54ccfc9512005e9d5dfafe87276c7564",
+   "answer_lines": [
+    21
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "lingthio/Flask-User/example_apps/user_profile_app.py",
+   "sha256": "5fd72c3e0d617e7a3822ae65114ae25ae439d00d59d1b38978aa8ce0ddb860e3",
+   "answer_lines": [
+    36
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "gepd/Deviot/libs/Menu.py",
+   "sha256": "746814edc4666b2cce290a7955d9ac1c55569f1690945790698662ed7d49925f",
+   "answer_lines": [
+    19,
+    105,
+    289,
+    292
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "treeio/treeio/treeio/services/identities.py",
+   "sha256": "bfa7a9ae1f5b90f565b3bb07c98b719e05355867951672a40fc2a9689ce2eb30",
+   "answer_lines": [
+    40
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "johncadigan/scrapy-sci/wallpaper_demo/wallpaper/data/quality/DataFeatures.py",
+   "sha256": "a3be06480147674fff6c2eb8ca80b89022199415d98b08ae01cdbf076404fb09",
+   "answer_lines": [
+    3
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Except block handles 'BaseException'",
+   "codeql_id": "py/catch-base-exception",
+   "query_path": "Exceptions/CatchingBaseException.ql",
+   "code_file_path": "klipstein/dojango/dojango/util/perms.py",
+   "sha256": "c46550d07542d3992965b0adccaf136f45390bd44d6deb30b8622702a3f3c154",
+   "answer_lines": [
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "LabPy/lantz/lantz/testsuite/test_foreign.py",
+   "sha256": "2d453ece5ad755c33160ead9bbe042b15c9716f1bb302c1dc2cedb96b4e57dc5",
+   "answer_lines": [
+    45
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "mmp2/megaman/megaman/geometry/tests/test_geometry.py",
+   "sha256": "50c01fb587ef42989df40eca80c13f51de7dd3f5186a54911d39946cf8988afa",
+   "answer_lines": [
+    34
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "hiidef/oauth2app/examples/mysite/apps/account/views.py",
+   "sha256": "0eabfc5dbc695182964f6a44860189610ec433b502611dc8afe6a7eb2721c276",
+   "answer_lines": [
+    68
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "dask/dask/dask/array/tests/test_wrap.py",
+   "sha256": "bc4e640809f447516e43a26d2161945d5479447db8c9bb028b6251ba171a72ca",
+   "answer_lines": [
+    36
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "ProgVal/Limnoria/src/questions.py",
+   "sha256": "3885bd23978089b4de2de7001b3c1c7e71ab8a95a4f96d7e23977e0999ecc841",
+   "answer_lines": [
+    133
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "blockstack/pybitcoin/pybitcoin/rpc/config.py",
+   "sha256": "a8ab4663ec1348538fef4c77f61ff0e480bd1bace918b5a7274ad6646236fb2f",
+   "answer_lines": [
+    57
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "lisa-lab/pylearn2/pylearn2/models/kmeans.py",
+   "sha256": "a232ca14dd1796efe3b656acbed4661baa2c9b169b9f304c62dff25e588ae73e",
+   "answer_lines": [
+    115
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "jpaugh/agithub/agithub/agithub_test.py",
+   "sha256": "d89246382b8f07cfa9a7d207aa95b1ef0f1d434fc001d4107a69b32a5cf31370",
+   "answer_lines": [
+    40
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "statsmodels/statsmodels/statsmodels/examples/ex_kernel_semilinear_dgp.py",
+   "sha256": "47ac50aa332e7cb28d1aa64a87801d92682d90100682a9658caf04c2c61d246b",
+   "answer_lines": [
+    25
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "Rediker-Software/doac/tests/tests/views/test_token.py",
+   "sha256": "0fec9dbaabbb3d7ed6449b86870d53c6c39163d952e52a0d22e2fd5fbc93223f",
+   "answer_lines": [
+    61
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "googleads/googleads-python-lib/examples/dfp/v201505/proposal_service/create_proposals.py",
+   "sha256": "f13e5f37a64a20ca9e0c8978bc06abbf859db191aa8180aa43a6b67a14ac7ec3",
+   "answer_lines": [
+    40
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "pyjs/pyjs/examples/kitchensink/sink/Tabs.py",
+   "sha256": "ea7e1aca5f133bc1a2423472e43a1ffbd0860d793b4eb4da87b48c6577827552",
+   "answer_lines": [
+    51
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "LxMLS/lxmls-toolkit/lxmls/sequences/bak/postag_features.py",
+   "sha256": "941113118bf91a950476a364b13ceedfeb2bba0e532f43b2ce59e84072120c1e",
+   "answer_lines": [
+    212,
+    214
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "Emsu/prophet/docs/conf.py",
+   "sha256": "35fa3df0eaa9bb6c941b47d35e8c081a01c5686efb8202874ba4a0fa6ce32eb3",
+   "answer_lines": [
+    123
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "openstack/ironic/ironic/tests/unit/db/test_node_tags.py",
+   "sha256": "92131dd8f9c7e854a32d5f9374f27cd192d8bca99e58300dabafd86bed315944",
+   "answer_lines": [
+    80
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "AppScale/appscale/AppTaskQueue/test/unit/test_tq_config.py",
+   "sha256": "2a96a90604eff027489ee5c25e55917f7bdc4f7b4ba3fc3af06e582caa653f41",
+   "answer_lines": [
+    172,
+    176,
+    192,
+    209,
+    229
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "abbotto/comsys/comsys.py",
+   "sha256": "71f3bcaed068e65ec0a139b401c46925c48146eec7fd5bd2fc67d212b92b87fc",
+   "answer_lines": [
+    44
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "shish/eve-mlp/eve_mlp/gui/mainframe.py",
+   "sha256": "776689be6a07cfed9b85bdb16e2b060ad242c424fc0a4ed6aabf1ae766f3566e",
+   "answer_lines": [
+    53
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "iogf/vy/vyapp/plugins/syntax/spider.py",
+   "sha256": "f2535a3564ad708ddef7fde718ef01e58eae4ab6a80b6fa502fc2a6790730159",
+   "answer_lines": [
+    24
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Variable defined multiple times",
+   "codeql_id": "py/multiple-definition",
+   "query_path": "Variables/MultiplyDefined.ql",
+   "code_file_path": "nltk/nltk/nltk/parse/malt.py",
+   "sha256": "0933d3b79dd9d7ab19a4f89383a22130bbb65691922b781a970520056fb8d71f",
+   "answer_lines": [
+    69
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "pyjs/pyjs/pyjswidgets/pyjamas/log.py",
+   "sha256": "c455b9ac235de12add05598e2f58f4788ffbbf594a8b06112207d346621d8d32",
+   "answer_lines": [
+    22
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "anandology/pyjamas/library/gwt/ui/Hidden.py",
+   "sha256": "313fce2ac9c1ade1c216c9e6253972492f7595bf1863af12dd30db16a7486207",
+   "answer_lines": [
+    61,
+    64
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "iovisor/bcc/tools/runqlat.py",
+   "sha256": "2b7b38c82e52ab20a6a57b1319444e29732184cbd149820c3022b91a41849dab",
+   "answer_lines": [
+    142
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "android/tools_repo/color.py",
+   "sha256": "87e179fdf7d2d8a82ff0eced9219fdf834d59a9b38eeccdf096f77b6ae03a841",
+   "answer_lines": [
+    155
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "CollabQ/CollabQ/vendor/gdata/tlslite/mathtls.py",
+   "sha256": "6871ad1d33a840a2698b92fa488fb49a1406e0b7430385b74d771ff37d7ac11b",
+   "answer_lines": [
+    33
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "natduca/quickopen/src/info_bar_gtk.py",
+   "sha256": "14027ab3de334b8f5a0dcdb0c299c49ae67df203f24c794b6cbf2ed7e8656b68",
+   "answer_lines": [
+    168
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "guillermooo/Vintageous/vi/settings.py",
+   "sha256": "de02836cae3f2960ce4b0587fb40ce3020cdc919813ec48ba047b45a94ddbe47",
+   "answer_lines": [
+    52
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "openstack/sahara/sahara/tests/unit/test_context.py",
+   "sha256": "e48572df1b3de9aaace1129cc215567d9ccd2360ba4d30fe22bfa7e3fb0bb927",
+   "answer_lines": [
+    68
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "ImageEngine/gaffer/python/GafferImageTest/ResampleTest.py",
+   "sha256": "6ba059e20cf7a6d88c245689e9e633b250086aa955e499438358f13051c37ded",
+   "answer_lines": [
+    119
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "rcos/Observatory/observatory/settings.py",
+   "sha256": "b5f2666e813c25981da4c2f52d5d4a2cc8d2d483aa17c9869f7dbf2dc32bb773",
+   "answer_lines": [
+    185
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "PyTables/PyTables/bench/search-bench-plot.py",
+   "sha256": "29fdd69099262e9ab9f20c72a5bc0fba916f7dae297fd1b92b7c52c54e520f6f",
+   "answer_lines": [
+    140
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "iovisor/bcc/tools/tcpconnect.py",
+   "sha256": "12620aaf910e2772fc7e5a49418bc5b4f3e5003cc11ce2d5a43c158297a520a4",
+   "answer_lines": [
+    165
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "tmm1/graphite/webapp/graphite/settings.py",
+   "sha256": "356b7e0ec352adbc6b8661e9ee546dbadcd1023f70f9ca131c6b43b800e5ebfd",
+   "answer_lines": [
+    239,
+    242,
+    246
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "samluescher/django-form-designer/form_designer/migrations/0009_set_data_to_form_log.py",
+   "sha256": "be88b0133918b0fa99e0097405f41526c501aba7563a7e81f8321fcd1013661f",
+   "answer_lines": [
+    31
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "BergWerkGIS/QGIS-CKAN-Browser/CKAN-Browser/request/auth.py",
+   "sha256": "4ae92298d88a0a33e52dc89b14881e4ee1a8a819f1189cd263e619d2c50dba5b",
+   "answer_lines": [
+    160
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "datastax/cstar_perf/frontend/cstar_perf/frontend/server/debug.py",
+   "sha256": "47f621cfd99e9f50bd83be67a1fa6b1127ffbbeee71fffea0188dca7268f090f",
+   "answer_lines": [
+    7
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "zoofIO/flexx/flexx/lui/tex.py",
+   "sha256": "b68a0c26ff8443061089cf479efcc22805ad7151a66a235c5bdcf1cef34e6bea",
+   "answer_lines": [
+    54,
+    173
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "ionelmc/python-hunter/src/hunter/actions.py",
+   "sha256": "724c7b65c979cf29c753632f102b88c55fef4fc55d88abb931a0dee4b22b4957",
+   "answer_lines": [
+    152
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "behave/behave/behave4cmd0/log/steps.py",
+   "sha256": "0a2f7564c4d48ab0187f88df2854466c59341ecb363f8de52bcd762215321324",
+   "answer_lines": [
+    393
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unreachable code",
+   "codeql_id": "py/unreachable-statement",
+   "query_path": "Statements/UnreachableCode.ql",
+   "code_file_path": "iovisor/bcc/tools/softirqs.py",
+   "sha256": "6f15b871bae358a92e23fdc529884c38ecffc89281fbcb130624af645e8880ec",
+   "answer_lines": [
+    106
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "Esri/3d-cities-template/Workflows/3DCityMaintenance/featureidgenerator.py",
+   "sha256": "325df3393965ab27ec492ad777f9d99121fb977280a62023e8b38d7b340a9190",
+   "answer_lines": [
+    182
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "mrknow/filmkodi/plugin.video.specto/resources/lib/sources/iwatchonline_mv_tv.py",
+   "sha256": "6e701ee2759e3fd34a33c12ef038dbe5a49ef0c4dedc3714230bc378c2985cb8",
+   "answer_lines": [
+    102,
+    115
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "Debian/debile/debile/master/server.py",
+   "sha256": "b833920f76289fe805e4aa10bedc679f61525c8098512ecd5a72688367098718",
+   "answer_lines": [
+    45
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "jookies/jasmin/jasmin/protocols/smpp/configs.py",
+   "sha256": "b123c3e755f92b422630a54741f77afd56e3f73da1602e38aec5b347fbbfb6a2",
+   "answer_lines": [
+    36,
+    39
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "arctic-nmt/nmt/nmt/homogeneous_data.py",
+   "sha256": "5bad2dc4b3bd6d3e3abbc91a3085267e3dbe93b537641ec5d40ef23d16b884bc",
+   "answer_lines": [
+    27
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "bblanchon/SublimeText-HighlightBuildErrors/HighlightBuildErrors.py",
+   "sha256": "85e1408998b3ed927ddc28c27eaf34995f2e9e10b4d637819a91e31a591d9789",
+   "answer_lines": [
+    173
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "mrknow/filmkodi/plugin.video.specto/resources/lib/sources/dizibox_tv.py",
+   "sha256": "39b5163ce917e20b27dc210cc75724d6699ed3838c537cb5002bad4acbebaf88",
+   "answer_lines": [
+    68,
+    97,
+    144
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "benadida/helios-server/helios_auth/jsonfield.py",
+   "sha256": "0bd315ab3ef2931493699d4f1fc0d1c4acf1dc9fab1724be82a8c44377ed407f",
+   "answer_lines": [
+    39,
+    60
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "PyCQA/pycodestyle/testsuite/E71.py",
+   "sha256": "ed0a7ce05009f9cd82c9b0672c2ec03103d16048768c9840bba873df0532eb28",
+   "answer_lines": [
+    2,
+    14
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "aerospike/aerospike-client-python/test/old_tests/test_admin_query_user.py",
+   "sha256": "369f7c12ed22e783b60d972edcdcb747b237e9b9ae154285c15d11495638c094",
+   "answer_lines": [
+    20
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "kivy/kivy/kivy/uix/recyclelayout.py",
+   "sha256": "2d9ee9ee7e096413c2c906ebda4165d4ffcd17a3cbc023394345a495bf90e2cc",
+   "answer_lines": [
+    104
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "google/transitfeed/transitfeed/fareattribute.py",
+   "sha256": "32fc69dbd185337c4a98380de4deb46ec7a85c41456ba1fb5ee396de6667677e",
+   "answer_lines": [
+    56,
+    63,
+    107,
+    121,
+    128
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "HenryHu/pybbs/store.py",
+   "sha256": "5e072130252f457d75f807421f31733d35f05abc5d374ee4cbb096157a513b9d",
+   "answer_lines": [
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "zrong/wpcmd/wpcmd/update.py",
+   "sha256": "259731e9e27a1cf2ae986b6d8abe5ba750323ed408f226f484041b9095180ace",
+   "answer_lines": [
+    270
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "bt3gl/Python-and-Algorithms-and-Data-Structures/src/trees/simple_tree.py",
+   "sha256": "cb1b3d680a36fee58c4528ab255dbd1ceb86c92d383ef667cad12cd4b8293146",
+   "answer_lines": [
+    13
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "frappe/frappe/frappe/utils/csvutils.py",
+   "sha256": "51c26ca0a916fb41e6689c3e452f1a2b038ca8232891c5a52c7ecf2828c38fce",
+   "answer_lines": [
+    118
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "cweill/GoTests-Sublime/GoTests.py",
+   "sha256": "70e1460536f8dbd6e63a0217119f652d0b212078d4a9b61dc8438c91030be44f",
+   "answer_lines": [
+    9
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "b3mb4m/shellsploit-framework/shell/encoders/xor_b3m.py",
+   "sha256": "23d3d56906269c0aa02d2b00945866fd21e4167616b77eb736c750c36a8a061f",
+   "answer_lines": [
+    76
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "kdart/pycopia/core/pycopia/fsm.py",
+   "sha256": "a3a2cddfa63d3619534ad44b1512391877da8c6c88e8e0206767de433d940ba8",
+   "answer_lines": [
+    104
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Testing equality to None",
+   "codeql_id": "py/test-equals-none",
+   "query_path": "Expressions/EqualsNone.ql",
+   "code_file_path": "Esri/solutions-geoprocessing-toolbox/utils/test/patterns_tests/IncidentDensityTestCase.py",
+   "sha256": "3bec1211b7bdff3b0a1c9290437a72afd889605ac8217c21db8cbc91acfcaa2b",
+   "answer_lines": [
+    47,
+    52
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "jamesturk/jellyfish/setup.py",
+   "sha256": "9cb33e044758c47972af7f19f1d9e79a6acdcaa13bc4e271120cf22e86150ea5",
+   "answer_lines": [
+    47
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "openstack/horizon/openstack_dashboard/test/integration_tests/pages/admin/system/hostaggregatespage.py",
+   "sha256": "0c8e8839267907bafe3951809b86ad33a1320094cf40a30d9096444662f0a3c9",
+   "answer_lines": [
+    40,
+    45
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "globocom/database-as-a-service/dbaas/workflow/steps/mongodb/upgrade/prereq_change_storage_engine_single.py",
+   "sha256": "b25a77966252ce7aeb81a8eeb746e02d04b01421f8bc823bee693c2b34999197",
+   "answer_lines": [
+    63
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "cloudera/hue/desktop/core/ext-py/pysaml2-2.4.0/example/idp2_repoze/modules/root.mako.py",
+   "sha256": "c64d165accc62f29c4081ecac77e0babc9d58e39faa4a416aeaf011d99cb99a5",
+   "answer_lines": [
+    74
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "bayespy/bayespy/bayespy/inference/vmp/nodes/tests/test_multinomial.py",
+   "sha256": "8c4b94a5a9f9db6cdb72e32aa0030363488e4962057ef5326f085c8352d521e0",
+   "answer_lines": [
+    95,
+    158,
+    171,
+    187
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "hwaf/hwaf/py-hwaftools/hwaf-system.py",
+   "sha256": "4caa94de32e0310f1c288eb0c469aa02ca4e64e86d6b5dac0c97e9700701c7ff",
+   "answer_lines": [
+    50,
+    72,
+    99,
+    105,
+    116,
+    119,
+    124,
+    132
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "rlpy/rlpy/rlpy/Domains/PacmanPackage/qlearningAgents.py",
+   "sha256": "a031ac0e36db7ff26dfc4bd6fcf3a93ba32b05bc39f10f5776971732dd195b66",
+   "answer_lines": [
+    190
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "kayhayen/Nuitka/tests/benchmarks/constructs/GeneratorExit.py",
+   "sha256": "5d95bf7f9acdc28e4cbb73030fc2222bb33985d8958f221719b70dc26c94eda0",
+   "answer_lines": [
+    39
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "francelabs/datafari/windows/python/Lib/test/pydoc_mod.py",
+   "sha256": "3a3ba9d8e9f51623b17af2e994ceca95741923e0ad1552c33850253a9ff8ee89",
+   "answer_lines": [
+    16
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "grawity/hacks/hacks/Dead-projects/Win32/df.py",
+   "sha256": "2df03723f84af09a2bf79e3dff0ba0e398e2827114290781be1b82ffef8a1373",
+   "answer_lines": [
+    167
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "Esri/solutions-geoprocessing-toolbox/suitability/toolboxes/scripts/RasterOffRoad.py",
+   "sha256": "fbfdaaf19331cb9a5bbdde61839b48487985f352a022150a03be9adfb3f0d680",
+   "answer_lines": [
+    318
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "koenbok/Cactus/cactus/tests/deployment/__init__.py",
+   "sha256": "8f1178ba14af5ec3cbcdff5fbe7f3ea07fcd45bce69bee858f8779c9462e2e5b",
+   "answer_lines": [
+    101
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "KaySackey/Nemo/nemo/nodes.py",
+   "sha256": "bb5a29c790444cd1499daaa66e7e9a178f44c0b3aa12181e6a0b4a41e8d068e7",
+   "answer_lines": [
+    245
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "divio/django-filer/filer/utils/files.py",
+   "sha256": "b9da3f65a2ce5666fe3fd7cf04d3d3d2d1f699c234267ddece7ed00dc6d0f960",
+   "answer_lines": [
+    48
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "iovisor/bcc/tools/dcstat.py",
+   "sha256": "8fc6100caf1e306fea5337c123e451ef47d2992ef1164ed5c8c9c32b10ac59fd",
+   "answer_lines": [
+    120
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "hwaf/hwaf/py-hwaftools/find_clhep.py",
+   "sha256": "2158586fa61754a6e39f42c8d05592cc71fe7d9df521b355227df691c65fe78f",
+   "answer_lines": [
+    32,
+    36,
+    47,
+    94
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "lepture/flask-wtf/tests/base.py",
+   "sha256": "ef67a5bb94655c03fd2061808154206188999bcb2470feaffbd78dfdb6d1b1c2",
+   "answer_lines": [
+    37
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "treeio/treeio/treeio/messaging/tests.py",
+   "sha256": "494ab72b603a64c840623746bd969a5b405d38ee853a408e6ddea873b9e9925c",
+   "answer_lines": [
+    148
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "iambus/SublimeIPython/sublime_ipython/sublime_utils.py",
+   "sha256": "4b033659d51febb2080c435eaf125485a1901591bd28b797336ae6cc876321bc",
+   "answer_lines": [
+    93
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary pass",
+   "codeql_id": "py/unnecessary-pass",
+   "query_path": "Statements/UnnecessaryPass.ql",
+   "code_file_path": "boundary/pulse-api-cli/tests/unit/boundary/alarm_update_test.py",
+   "sha256": "f1b3e6080624b392df0fa85cb2eb9b00f2d2646963b4c2c726c4db2f0f26eb7f",
+   "answer_lines": [
+    25
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "nicksergeant/snipt-old/django_authopenid/util.py",
+   "sha256": "5ffd5852b89b3dff4f3f63ac8e03ec735de8089541578618979d0a3fecf95cce",
+   "answer_lines": [
+    18
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "sympy/sympy/sympy/__init__.py",
+   "sha256": "5872a707225ff3d5ecc1dfe9ec659543d6ea1215ccd0ef36d94b782b8e6e609d",
+   "answer_lines": [
+    55
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "AppScale/appscale/AppServer/google/appengine/ext/preload/__init__.py",
+   "sha256": "7d9c90d3d55a65fef5906fd27fef9d138396a8263f37252923598e16ed6b98f9",
+   "answer_lines": [
+    57,
+    136,
+    138,
+    142,
+    173,
+    178,
+    180
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "Ali-Razmjoo/OWASP-ZSC/module/readline_windows/pyreadline/keysyms/common.py",
+   "sha256": "33d0719ba197843066700a373421f71d6fa45d8ad16298f8d60dc4ee97e75721",
+   "answer_lines": [
+    15
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "AppScale/appscale/AppServer/google/appengine/ext/ereporter/ereporter.py",
+   "sha256": "5523c07ea6a5cc17f272ddd8efe089dfcf0a0f99beb7f61563d4074e878255d2",
+   "answer_lines": [
+    84
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "azoft-dev-team/imagrium/env/Lib/test/test_md5.py",
+   "sha256": "a079304cfb4eb97990a912907cd12a26f14417ff5d39cb0e9b08e6fdec6a8f91",
+   "answer_lines": [
+    7
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "AppScale/appscale/AppServer/lib/PyAMF-0.6.1/pyamf/adapters/_sets.py",
+   "sha256": "dc1c744157eabecbb722fffced8c3026250a8e406f2940f9e68138643a163599",
+   "answer_lines": [
+    10
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "davemerwin/blue-channel/external_apps/registration/models.py",
+   "sha256": "570de4896100b8f5f89409d78da0f977546c9ca4e3b49ff277f0782304d577d7",
+   "answer_lines": [
+    4
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "anandology/broadgauge/broadgauge/template.py",
+   "sha256": "b7e7c69e192c66021abf2cd303ea43d720703f7c0bec7343aa0512a738c5a19b",
+   "answer_lines": [
+    4
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "CouchPotato/CouchPotatoV1/library/mako/ext/pygmentplugin.py",
+   "sha256": "0ac1df240acbc9328287f044bc79e3b7318c4941677682d982e6e867164bd1f1",
+   "answer_lines": [
+    5
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "kuri65536/python-for-android/python-modules/twisted/twisted/mail/scripts/mailmail.py",
+   "sha256": "1681dbe95f0cb318de69d289d42774e7920352d83fbe964532f36604b30ccb38",
+   "answer_lines": [
+    11
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "amitu/gitology/src/gitology/d/templatetags/enable_comments.py",
+   "sha256": "1672daf363c71788b719a9670c50c4fd47f2ddb4a0e630d539898382f04426f4",
+   "answer_lines": [
+    2
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "dgraziotin/dycapo/piston/forms.py",
+   "sha256": "0afcc9c638a63eebf34afa70829f68797a8c29587df1b334fbf0de466ae72d1b",
+   "answer_lines": [
+    57
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "RoseOu/flasky/venv/lib/python2.7/site-packages/coverage/backward.py",
+   "sha256": "59e3f6a8f35a6c3bac82039a65cadc4beb063504f920690ba72dee9e34182497",
+   "answer_lines": [
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "azoft-dev-team/imagrium/env/Lib/test/test_modulefinder.py",
+   "sha256": "554f971930cfcdbe45dc31d79bc49d1d65ef3ced98b1b7845d4531d75a4702a1",
+   "answer_lines": [
+    10
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "cloudera/hue/desktop/core/ext-py/South-1.0.2/south/management/commands/datamigration.py",
+   "sha256": "41a1d6e00ee3d7ac9d6400b7b06cb7d308a90ec9368628c78758ed2f43e55af3",
+   "answer_lines": [
+    15
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "CollabQ/CollabQ/vendor/gdata/tlslite/mathtls.py",
+   "sha256": "6871ad1d33a840a2698b92fa488fb49a1406e0b7430385b74d771ff37d7ac11b",
+   "answer_lines": [
+    7,
+    8,
+    116
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "albatrossandco/brubeck_cms/brubeck/core/emailing/views.py",
+   "sha256": "878063adff682b2ce4de8fc5cf2d0d601f7de2344b2f7350e8b1041a67d63a8d",
+   "answer_lines": [
+    10
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "nltk/nltk/nltk/decorators.py",
+   "sha256": "1b0b8adecc2b87e799d718cddd2797b2bce4b661b8af268004c7db60b9be5436",
+   "answer_lines": [
+    30
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Import of deprecated module",
+   "codeql_id": "py/import-deprecated-module",
+   "query_path": "Imports/DeprecatedModule.ql",
+   "code_file_path": "babble/babble/include/jython/Lib/MimeWriter.py",
+   "sha256": "4dcca4420e2c68ac7258748e2db0eff2f764f1233882ac025b2f6007d8a8de65",
+   "answer_lines": [
+    13
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "ReactiveX/RxPY/examples/timeflies/timeflies_tkinter.py",
+   "sha256": "a02d602005d08b883de1cbcaecdca7a6f10b7cb77a63777f5c7823211d6a0976",
+   "answer_lines": [
+    5
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "enthought/comtypes/comtypes/errorinfo.py",
+   "sha256": "f9c87e1c50af56da9cad7c86aa56dce3d7d481156108efb15b45de87231808eb",
+   "answer_lines": [
+    2
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "OpenCobolIDE/OpenCobolIDE/open_cobol_ide/extlibs/future/moves/tkinter/font.py",
+   "sha256": "82bc8b0d6d0f1b107170a22e87bca79b708f1f2ee8831c65cdd6b565c79680e0",
+   "answer_lines": [
+    6
+   ],
+   "split": "test",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "koenbok/Cactus/cactus/listener/mac.py",
+   "sha256": "dc81ce1ac7fa89d545a2960f90dc85dfbde5e22a436a0a3d99544f753d375b0d",
+   "answer_lines": [
+    7
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "jolynch/mit-tab/mittab/libs/data_import/import_rooms.py",
+   "sha256": "1efe847ab9cd8f2dce89e0b511ce463385540f9bb9c2e07559829319b1648dc4",
+   "answer_lines": [
+    24
+   ],
+   "split": "test",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "ctxis/canape/CANAPE.Scripting/Lib/ctypes/_endian.py",
+   "sha256": "7c3ec743f700b7c846f09482c18f6e96ce3c2a816267b9997a272bbd253ec024",
+   "answer_lines": [
+    5
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "byt3bl33d3r/pth-toolkit/lib/python2.7/site-packages/openchange/utils/fdunix.py",
+   "sha256": "8028ed70efdd435f64608390f6c849491ebec29e88c1ee881e11dba88f3d9f79",
+   "answer_lines": [
+    24
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "francelabs/datafari/windows/python/Lib/ctypes/test/test_checkretval.py",
+   "sha256": "a9d63858e3a481b3dabe85219aaea117a98eb0f8aa6271d16a5195cc071117ce",
+   "answer_lines": [
+    3
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "jdf/processing.py/misc/ast/astpp.py",
+   "sha256": "6d5d81a0c617690f0644994b43d7c58c7be57d3f68c4100fdd430798341de3c6",
+   "answer_lines": [
+    10
+   ],
+   "split": "test",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "codeupstudio/chipincode/models/db.py",
+   "sha256": "4951cd5efa8f58212c7cf21244c39909fedbed9fc3ea168b0ce31e50ba0183bf",
+   "answer_lines": [
+    86
+   ],
+   "split": "test",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "grawity/hacks/hacks/Dead-projects/Win32/df.py",
+   "sha256": "2df03723f84af09a2bf79e3dff0ba0e398e2827114290781be1b82ffef8a1373",
+   "answer_lines": [
+    23
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "OpenCobolIDE/OpenCobolIDE/open_cobol_ide/extlibs/future/moves/tkinter/dnd.py",
+   "sha256": "aaad76ff080b2f47f57bdbc6f36d791402e984326237f0573d5b5d029ce30369",
+   "answer_lines": [
+    6
+   ],
+   "split": "test",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "algorhythms/LintCode/Binary Representation.py",
+   "sha256": "5324f5b21d2b779f86f630696ab0a750f9bc9f5244709bd506fd8acea5c2dfd5",
+   "answer_lines": [
+    10
+   ],
+   "split": "dev",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "enthought/comtypes/comtypes/util.py",
+   "sha256": "7257ebfe9be5fdca3ce66580a877240c1895b2119f6a39b26d8d039c2f40e074",
+   "answer_lines": [
+    4
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "rougier/freetype-py/freetype/ft_types.py",
+   "sha256": "da514399f9f0c12066731d142f46fbb8d6835e693f96ebaf599e7acb5d19acb9",
+   "answer_lines": [
+    77
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "Arelle/Arelle/arelle/ViewWinRssFeed.py",
+   "sha256": "601b856a1ffaa78545f59b20b21d6f4efaf9779591adfba4d47e2daa602e6878",
+   "answer_lines": [
+    7
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "ardekantur/pyglet/pyglet/font/quartz.py",
+   "sha256": "6619765f85dedaf249dd23628312a40c43771c035bebdf7bc3e417c150172054",
+   "answer_lines": [
+    46
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "the-xkcd-community/the-red-spider-project/src/level_up.py",
+   "sha256": "902bfb086341805cb5df23f36ddfe5508a2da35b798b5fbb3318cb76398981a8",
+   "answer_lines": [
+    11
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "OpenCobolIDE/OpenCobolIDE/open_cobol_ide/extlibs/future/moves/tkinter/constants.py",
+   "sha256": "eab509a2eea4a819681d4eb6d2dac5825cb5f0ee4ea0ca0fea78418e445dc4fe",
+   "answer_lines": [
+    6
+   ],
+   "split": "test",
+   "reproduces": false
+  },
+  {
+   "query_name": "'import *' may pollute namespace",
+   "codeql_id": "py/polluting-import",
+   "query_path": "Imports/UnintentionalImport.ql",
+   "code_file_path": "shaurz/fsmonitor/tests/test3.py",
+   "sha256": "8e6bcbc1eaccdac34efb6e342c55b10754052cf1a1198877b90119f39e70b220",
+   "answer_lines": [
+    2
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "html5lib/html5lib-python/html5lib/treewalkers/_base.py",
+   "sha256": "7a2fb67056cd15dd20463c9a166c67c5918b3480f8a346c71421fd6ccc99e419",
+   "answer_lines": [
+    49
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "ARTbio/tools-artbio/tools/msp_sr_bowtie_parser/sRbowtieParser.py",
+   "sha256": "e1415d9c512744dbef25122f6496210c8ef5b29a6f2fdd2cbb08bf577c8c1335",
+   "answer_lines": [
+    42
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "sccn/SNAP/src/rpyc/core/service.py",
+   "sha256": "8f13b9c6e57a17989c60d717a0730a2dec96e7be041faff1445b43d6ae121a88",
+   "answer_lines": [
+    66
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "andymccurdy/redis-py/tests/conftest.py",
+   "sha256": "2a12708cfb3a8e9a31a3a301a1ce67eaa9f6466601d42cdd89fe3e0896d6d573",
+   "answer_lines": [
+    53
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "Bookworm-project/BookwormDB/bookwormDB/wordcounter.py",
+   "sha256": "dc2c38c2405c10ab783e18415577fb0b05f96d7228b8e189f7edb0acb698fa3b",
+   "answer_lines": [
+    44
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "thisissoon/Flask-Store/docs/conf.py",
+   "sha256": "0ccec5bee0296a3f3598c94e6c9035be9524b3743cb29b78c8d1eaf9b40ecd52",
+   "answer_lines": [
+    26
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "saltstack/salt/salt/states/zabbix_host.py",
+   "sha256": "48c7b7c12463f9c71a82a5883c8ebd32de99433a28786e3e8d252c90f8d09009",
+   "answer_lines": [
+    121
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "allisson/flask-example/accounts/forms.py",
+   "sha256": "ffc3ae6ac115112e614dcb7d3a3a15a272e1102051591ad30e37fa1d118b4e8f",
+   "answer_lines": [
+    153
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "XiaoMi/minos/supervisor/superlance/tests/httpok_test.py",
+   "sha256": "c06099b4ef5adc5797dca6dfb7a825a6bdc9b3fee3845cd9fef1b413847f7e4f",
+   "answer_lines": [
+    70,
+    71
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "statsmodels/statsmodels/statsmodels/tsa/filters/_utils.py",
+   "sha256": "0793a8220c7f8cb6c3cdc1469966c5d6d0c0580c743714379618712d74e086b6",
+   "answer_lines": [
+    12
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "cloudera/hue/desktop/core/ext-py/openpyxl-2.3.0-b2/openpyxl/worksheet/dimensions.py",
+   "sha256": "881c6793adcc2743f0b005504c9845a4cf5d4d71336734e011a2c90f0684d0d2",
+   "answer_lines": [
+    93
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "9miao/Firefly/gfirefly/test/test_netconnect_client.py",
+   "sha256": "b20ac97bbd87790f554ddfaac0ee5c1880bfafbe5713fcbd0c44946f47dfee5b",
+   "answer_lines": [
+    26
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "enthought/depsolver/depsolver/request.py",
+   "sha256": "059ac5bc5b4a707a0ace5a7972a4b99cdfd9b68393784c112362e0c767c3f4f8",
+   "answer_lines": [
+    21
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "openstack/taskflow/taskflow/states.py",
+   "sha256": "7d5f5b14cf37d193fdb2ff1b2d1965478dcb4dc49af8bdd86e1fcc8000805c43",
+   "answer_lines": [
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    48
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "SheffieldML/GPy/GPy/models/mrd.py",
+   "sha256": "c69ea37e5619e1d234d7a8fd2584511961b337d3dff528bd6d01621d2334e664",
+   "answer_lines": [
+    118
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "StackStorm/st2/st2api/tests/unit/controllers/v1/test_actions_rbac.py",
+   "sha256": "8fbcc9cc0b4aea3e1f245d22b543301f13ef03146d93d843853267d717b5500a",
+   "answer_lines": [
+    75
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "markuskiller/textblob-de/textblob_de/ext/_pattern/compat.py",
+   "sha256": "d705b865b61fcf8e9999c2e7a6ff769920b856a629e7d1ac4e6f1d0a10e16a80",
+   "answer_lines": [
+    25
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "beltashazzer/jmpy/jmpy/plotting/histogram.py",
+   "sha256": "c57fcf834d481559fda0a4c067607379cd563fcf15586fd779befec07778eb22",
+   "answer_lines": [
+    45
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "tomashanacek/mock-server/mock_server/methodslisting.py",
+   "sha256": "af55f29e492f38e3d9e4edf5611e1bc13dba766fadfebdfd2c632955a6cf8e1a",
+   "answer_lines": [
+    189
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Redundant assignment",
+   "codeql_id": "py/redundant-assignment",
+   "query_path": "Statements/RedundantAssignment.ql",
+   "code_file_path": "aigamedev/scikit-neuralnetwork/examples/bench_cifar10.py",
+   "sha256": "9fe0baa6eb4580fdb4c1ce8574b534d7c73e98a69e3cdbb2de05a0ca99d2067d",
+   "answer_lines": [
+    42
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "openelections/openelections-core/openelex/lib/__init__.py",
+   "sha256": "6f356d7dffe9770f9c9a5b76ad2d49576bde9f683f6d791b0c9f092157fceb38",
+   "answer_lines": [
+    137
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "goFrendiAsgard/kokoropy/kokoropy/packages/sqlalchemy/ext/horizontal_shard.py",
+   "sha256": "4f7d48b074a9c890b6ed82c7b12c50ed1e2e1889f882e202b1534d0d613df789",
+   "answer_lines": [
+    69
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "NORDUnet/opennsa/opennsa/topology/nml.py",
+   "sha256": "6cb93f3a2c962914c4f3e8ea740e0fc5a283e5baad0e32b2bc66f8a8ef7bfc7f",
+   "answer_lines": [
+    203
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "ramses-tech/nefertari/nefertari/utils/utils.py",
+   "sha256": "29a728211692572b6e5dc6fb5279ccfccc9476855afa56be6daec04191e249ea",
+   "answer_lines": [
+    163
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "Arelle/Arelle/arelle/ViewWinRssFeed.py",
+   "sha256": "601b856a1ffaa78545f59b20b21d6f4efaf9779591adfba4d47e2daa602e6878",
+   "answer_lines": [
+    65
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "jaysw/ipydb/ipydb/metadata/model.py",
+   "sha256": "54ec4bbb2fd8e0f35ba6707fd327d5b0bfc591e25897de2c27cad1e08c7f38a7",
+   "answer_lines": [
+    232
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "openstack/sahara/sahara/utils/openstack/base.py",
+   "sha256": "60fda39d2277924d221eb1fab1d671f02c3b12b06576c21b096a5ced52a7dc95",
+   "answer_lines": [
+    80
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "scieloorg/scielo-manager/scielomanager/health/checks.py",
+   "sha256": "b0c99e72d976063dfe3f4d52811dd7f4eb6b49c675e7610ddccf04fd847348a1",
+   "answer_lines": [
+    48
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "glue-viz/glue/glue/core/qt/component_id_combo.py",
+   "sha256": "06057e772588e9c2d777981922b8c20c8a07afc1b54b5ab4276594753ed86de9",
+   "answer_lines": [
+    36
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "KeepSafe/aiohttp/demos/chat/setup.py",
+   "sha256": "9a68dfe5f54afbae0b86207e2caeedfb84378a6d0ae246817ae712945e587a6e",
+   "answer_lines": [
+    12
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "giampaolo/psutil/setup.py",
+   "sha256": "323ba8c08f3f4d9dbc92227a85aaf2ada679718f1a67fdb1a08485441e9b1b6a",
+   "answer_lines": [
+    32
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "cloudera/hue/desktop/core/ext-py/lxml-3.3.6/setupinfo.py",
+   "sha256": "aa68df2adf78a2bc9cea648c5985501aad4fcfd12d95e7c67b5801d2f47d1f4e",
+   "answer_lines": [
+    310,
+    325
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "potatolondon/djangae/djangae/db/consistency.py",
+   "sha256": "8e1d03db17ac704399e749c858ee78a413075db2e4c556d15a4d51f5d6032260",
+   "answer_lines": [
+    46,
+    72
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "ipeirotis/Mturk-Tracker/app/mturk/main/management/commands/crawler/tasks.py",
+   "sha256": "295e3946b1ad36331250cffe6c9356d6ed5d28c161ed8b5138ca0c76a52bfd40",
+   "answer_lines": [
+    36
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "gkno/gkno_launcher/src/networkx/algorithms/isomorphism/matchhelpers.py",
+   "sha256": "65634e19cc15e0405cb0e35ff91a7ed7c6246e260e609892eb60c62d389e7c18",
+   "answer_lines": [
+    201,
+    258,
+    335
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "aio-libs/aiomysql/setup.py",
+   "sha256": "7160e6a1ae08a558879eb56cb678743950188d67a6c783b989efd658d8b616b9",
+   "answer_lines": [
+    30
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "circuits/circuits/tests/conftest.py",
+   "sha256": "aacb1667ec146c83b2e4dba1daa7af72562f517b39a152ba0632072b0b292710",
+   "answer_lines": [
+    30
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "RoseOu/flasky/venv/lib/python2.7/site-packages/sqlalchemy/orm/path_registry.py",
+   "sha256": "6ce06a50273809fefd19f9bfba9a439817ae93db8f29d6ec89423c32099e5b16",
+   "answer_lines": [
+    85
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "giampaolo/psutil/docs/conf.py",
+   "sha256": "1a112fea151c7d0e041bc6b23f2ce5317b6c939c4d8450565710efa0b8efe80b",
+   "answer_lines": [
+    28
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Unnecessary 'else' clause in loop",
+   "codeql_id": "py/redundant-else",
+   "query_path": "Statements/UnnecessaryElseClause.ql",
+   "code_file_path": "Yubico/u2fval/u2fval/core/controller.py",
+   "sha256": "9f199410eba5b2f7f496b5438894195a7ea66b25ef67a95decb80f8215160e7f",
+   "answer_lines": [
+    192
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "flask-admin/flask-admin/examples/pymongo/app.py",
+   "sha256": "34cbf4c2ed5926b72cac4940eb874438de2f90df8fcfddd76c524634d69c86ef",
+   "answer_lines": [
+    124
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "lingthio/Flask-User/example_apps/user_profile_app.py",
+   "sha256": "5fd72c3e0d617e7a3822ae65114ae25ae439d00d59d1b38978aa8ce0ddb860e3",
+   "answer_lines": [
+    155
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "ask/flask-celery/example/myapp.py",
+   "sha256": "ff2be976f54e7a4d4abd129c397b57a390ff3fd2ef77df8e35ad069e30b4a490",
+   "answer_lines": [
+    36
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "sloria/webargs/examples/flask_example.py",
+   "sha256": "b1d0a83e234976f5f551dfd3fc7713aac90e20691fc9a849af7e779d329f548a",
+   "answer_lines": [
+    68
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "christabor/MoAL/MOAL/systems_engineering/architecture/soa/microservice/shipping_svc/app.py",
+   "sha256": "f92c605443c25d856cc53332237f0f9323c2a1dbcee82a5f0433602f18977b56",
+   "answer_lines": [
+    25
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "spantaleev/flask-sijax/examples/comet.py",
+   "sha256": "3dc384157e874d3d49e6061e7d4b57855b23f505552fb41d96ffe05b26e119d6",
+   "answer_lines": [
+    53
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "flask-admin/flask-admin/examples/auth-mongoengine/app.py",
+   "sha256": "055d6933cc80aaccfd179760c0574c3103c1ab93733d7344ff6d828d8523302d",
+   "answer_lines": [
+    147
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "fordham-css/ptp/vis-api-server.py",
+   "sha256": "fe430456e318021e063e00e32f27c4adf77235660c36c02752917684cde42755",
+   "answer_lines": [
+    40
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "chdoig/scipy2015-blaze-bokeh/app/my_bokeh_app.py",
+   "sha256": "20bca23b0ad7e363ac1c463451d58b487b316e09c3f874c18dd587980b255958",
+   "answer_lines": [
+    59
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "mrjoes/flask-admin/examples/multi/app.py",
+   "sha256": "26d4a2af968e30aa6c0e3492a6b0f49770950515dc2d5de58b8b3a2aae167788",
+   "answer_lines": [
+    39
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "thisissoon/Flask-Via/flask_via/examples/mixed.py",
+   "sha256": "debfd7cb6ad8e940b2532ab3456df6ad1c4d0d65b8f3e88c2d635f2c5fc95318",
+   "answer_lines": [
+    68
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "jarus/flask-mongokit/example/todo.py",
+   "sha256": "3b8aa4f9112ad5511f56a503696eb84792243d87de525837bbc876f24f236a5d",
+   "answer_lines": [
+    47
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "flask-admin/flask-admin/examples/wysiwyg/app.py",
+   "sha256": "1d0d345f60a03346e5a3efb3bb9d334c0dfd483550ab72ff0448de55634b4602",
+   "answer_lines": [
+    73
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "flask-admin/flask-admin/examples/peewee/app.py",
+   "sha256": "a63fa1251909afc48a22312e190aaf5e27a0c56b4caa42bf3f8e8a5a0866cf2f",
+   "answer_lines": [
+    98
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "kylewm/flask-micropub/example.py",
+   "sha256": "3e109fc1aadba68f3e3a052786f01d5a548d759c8322d504351e30e90a2f450f",
+   "answer_lines": [
+    87
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "dpgaspar/Flask-AppBuilder/examples/quickminimal/run.py",
+   "sha256": "ce63d963c86b970cbce01ea4af13510934dd23497b386b33968ae6acbb180999",
+   "answer_lines": [
+    15
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "miguelgrinberg/oreilly-intro-to-flask-video/4a/plus1.py",
+   "sha256": "5b1409c26f8df07c8373ef4259c4f2a249970e60661b23b474f6f6eeae15a036",
+   "answer_lines": [
+    16
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "wong2/doora/app.py",
+   "sha256": "09400b6fa213e422b6d34f5546af10fa33f1a556772524bc07c78144edab44c0",
+   "answer_lines": [
+    33
+   ],
+   "split": "test",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "miguelgrinberg/flask-video-streaming/app.py",
+   "sha256": "8967dc7707e5f1a3316e674125619521132062b8740643e82d3e818f0802bbe7",
+   "answer_lines": [
+    35
+   ],
+   "split": "dev",
+   "reproduces": true
+  },
+  {
+   "query_name": "Flask app is run in debug mode",
+   "codeql_id": "py/flask-debug",
+   "query_path": "Security/CWE-215/FlaskDebug.ql",
+   "code_file_path": "moskytw/mosql/examples/70_web.py",
+   "sha256": "5ac422d8de7038d08251e5801dd3791ce57ca6fd42fd6e9f69ebbc1680e13083",
+   "answer_lines": [
+    31
+   ],
+   "split": "test",
+   "reproduces": true
+  }
+ ]
+}

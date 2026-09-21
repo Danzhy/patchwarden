@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.patchwarden/
+eval/data/
+spikes/out/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+patchwarden.patch
+patchwarden-report.md

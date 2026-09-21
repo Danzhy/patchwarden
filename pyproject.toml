@@ -1,0 +1,44 @@
+[project]
+name = "patchwarden"
+version = "0.1.0"
+description = "An agent that fixes static-analysis warnings, with policy in code, escalation and traces."
+readme = "README.md"
+authors = [
+    { name = "Daniar", email = "zhylangozov.daniar@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "bandit[sarif]>=1.9.4",
+    "langgraph>=1.2.12",
+    "openai>=3.16.2",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "ruff>=0.16.8",
+    "typer>=0.27.2",
+]
+
+[project.scripts]
+patchwarden = "patchwarden.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["tests/fixtures", "spikes/out"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+norecursedirs = ["fixtures"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+]
