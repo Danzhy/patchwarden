@@ -43,6 +43,7 @@ def test_ruff_fixes_only_allowlisted_findings(scanned):
         # The unused import in the protected auth/ file is left for a human.
         assert ws.changed_files() == ["app/shapes.py", "app/utils.py"]
         utils = ws.read("app/utils.py")
+        assert utils.startswith("def total(items: list[int])")  # no blank lines left on top
         # Only unsafe fixes exist for these; they stay for the Fixer.
         assert "unused = 0" in utils and "value == None" in utils
         assert "bucket=[]" in utils
@@ -56,10 +57,10 @@ def test_remaining_findings_have_current_lines(scanned):
         assert len(det.remaining) == 15 - 6
         assert not set(det.resolved) & {f.fingerprint for f in det.remaining}
         by_rule = {(f.rule_id, f.file): f for f in det.remaining}
-        # Two import lines above it were removed: F841 moved from line 7 to line 4.
+        # The three import lines and the blank lines after them went: F841 moved from 7 to 2.
         f841 = by_rule[("ruff:F841", "app/utils.py")]
-        assert f841.region.start_line == 4
-        assert ws.read("app/utils.py").splitlines()[3].strip() == "unused = 0"
+        assert f841.region.start_line == 2
+        assert ws.read("app/utils.py").splitlines()[1].strip() == "unused = 0"
         # Same fingerprint as in the original scan, so pre-classification still applies.
         assert f841.fingerprint in result.preclass
 

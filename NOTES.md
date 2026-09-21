@@ -206,3 +206,22 @@ Consequences for `llm.py` (M3):
   nothing was sent or spent). Now `tests/conftest.py` removes the key, disables `load_dotenv`
   and runs every test in a temp cwd, so a test can't reach the network or write into the project.
 - 184 tests, 97% coverage (llm 98%, graph 99%, store 98%, pipeline 100%).
+
+### First real run (2026-09-22, run `20260921-210023-e32171`)
+`patchwarden fix tests/fixtures/repo_small --budget-usd 0.10`, unsandboxed (TLS proxy, see M0).
+- Same result as the scripted e2e test: ruff 6, Fixer 2 (F841 removed, E711 → `is None`),
+  3 suggestions (SIM103 ×2, B006 with a correct `None` sentinel), 4 escalations. Every edit
+  applied on the first attempt; no invalid JSON, no violations, no retries.
+- **Cost $0.0192**: Fixer (claude-sonnet-5) 5 calls, $0.0172, ~1.1k tokens in / ~110 out each;
+  Triage (deepseek-v4.1-flash) 9 calls, $0.0020. Reasoning tokens 0 with reasoning off.
+- **Latency 2 min, mostly Triage**: four deepseek calls took 18–23 s each for ~150 output tokens
+  (the rest 1–10 s); Sonnet fixer calls ~3 s. Provider-side. For M6 (hundreds of findings) triage
+  calls should run concurrently or use a faster provider route.
+- Triage wanted `auto_fix` for B006/SIM103 (not allowlisted) and for the protected-path F401; clamp
+  raised them (4 `clamped=1` rows), which is the `triage_policy_disagreement` signal M4 flags. The
+  Triage escalation notes are useful as "proposed approach" (e.g. B602: switching to shell=False
+  breaks callers passing strings).
+- Two fixes from reading the output: (1) ruff removing the leading imports left `app/utils.py`
+  starting with two blank lines; the deterministic pass now strips new leading blank lines.
+  (2) The llm_decides reason read "raised to suggest: no policy rule applies"; it now says the
+  rule isn't on the auto-fix allowlist, so a human reviews the fix.

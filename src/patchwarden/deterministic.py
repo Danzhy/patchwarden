@@ -63,6 +63,14 @@ def ruff_fix(ws: Workspace, file: str, codes: list[str], timeout: int = 120) -> 
         raise AnalyzerError(f"ruff --fix exited {proc.returncode} on {file}: {tail}")
 
 
+def _strip_new_leading_blank_lines(ws: Workspace, file: str) -> None:
+    """Removing a file's leading imports leaves it starting with blank lines; drop them unless
+    the file started that way."""
+    before, after = ws.original(file), ws.read(file)
+    if after != before and before[:1] not in ("\n", "\r") and after[:1] in ("\n", "\r"):
+        ws.write(file, after.lstrip("\r\n"))
+
+
 def run_deterministic(
     ws: Workspace,
     result: ScanResult,
@@ -73,6 +81,7 @@ def run_deterministic(
     by_file = candidates(result)
     for file, selected in sorted(by_file.items()):
         ruff_fix(ws, file, sorted({f.rule_id.removeprefix("ruff:") for f in selected}))
+        _strip_new_leading_blank_lines(ws, file)
     changed = [f for f in ws.changed_files() if f in by_file]
     if not changed:
         out.remaining = list(result.findings)

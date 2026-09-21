@@ -57,7 +57,10 @@ def pre_classify(finding: Finding, cfg: Config) -> PreClass:
             reason=f"rule {finding.rule_id} is on the auto-fix allowlist",
             matched_pattern=pat,
         )
-    return PreClass(kind=PreClassKind.llm_decides, reason="no policy rule applies")
+    return PreClass(
+        kind=PreClassKind.llm_decides,
+        reason="not on the auto-fix allowlist, so a human reviews any fix",
+    )
 
 
 _CAUTION = {Decision.auto_fix: 0, Decision.suggest: 1, Decision.escalate: 2}
