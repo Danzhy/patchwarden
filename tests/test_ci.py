@@ -65,7 +65,8 @@ def test_fix_job_isolates_the_prs_code(wf):
     assert "--no-llm" in run["run"] and '--config-from "origin/$BASE"' in run["run"]
     assert "${{" not in run["run"]  # event data only via env, never pasted into the script
     [upload] = [s for s in steps if s.get("uses", "").startswith("actions/upload-artifact@")]
-    assert upload["if"] == "always()" and "/." not in upload["with"]["path"]  # no hidden dirs
+    # not always(): that also runs when a newer push cancels the run
+    assert upload["if"] == "${{ !cancelled() }}" and "/." not in upload["with"]["path"]
 
 
 def test_comment_job_never_runs_the_prs_code(wf):
@@ -73,6 +74,9 @@ def test_comment_job_never_runs_the_prs_code(wf):
     job = doc["jobs"]["comment"]
     assert job["needs"] == "fix"
     assert "head.repo.full_name == github.repository" in job["if"]
+    assert job["if"].startswith("!cancelled()") and "always()" not in job["if"]
+    # Only with a report: exit 2 means fix failed before writing one.
+    assert "exit_code == '0' || needs.fix.outputs.exit_code == '1'" in job["if"]
     assert not [s for s in job["steps"] if "checkout" in s.get("uses", "")]
     for s in job["steps"]:
         assert "${{" not in s.get("run", "")
@@ -113,6 +117,15 @@ def test_init_ci_writes_once(tmp_path):
     assert forced.exit_code == 0 and "branches-ignore: ['dev']" in target.read_text()
     bad = runner.invoke(app, ["init-ci", str(tmp_path), "--force", "--install", "$(id)"])
     assert bad.exit_code == 2 and "not a plain pip requirement" in bad.output
+
+
+def test_init_ci_only_at_the_repo_root(tmp_path):
+    git(tmp_path, "init", "-q")
+    (tmp_path / "sub").mkdir()
+    res = runner.invoke(app, ["init-ci", str(tmp_path / "sub")])
+    assert res.exit_code == 2 and "not the top of its git repository" in res.output
+    assert not (tmp_path / "sub/.github").exists()
+    assert runner.invoke(app, ["init-ci", str(tmp_path)]).exit_code == 0
 
 
 # --- policy from the base branch ------------------------------------------------------------
@@ -194,11 +207,11 @@ def test_fix_with_config_from(pr_repo, tmp_path):
 # --- the comment body -----------------------------------------------------------------------
 
 
-def test_mentions_are_defused_outside_code_only():
+def test_mentions_are_defused_outside_fenced_code_only():
     report = "\n".join(
         [
             "Ping @octocat and @org/team, mail a@b.com.",
-            "Inline `@property` stays.",
+            "Inline `@property` too: GitHub's code span rules are easy to get wrong.",
             "  ```diff",
             "  +@property",
             "  +def x(self): ...  # @someone",
@@ -209,9 +222,31 @@ def test_mentions_are_defused_outside_code_only():
     body = render_body(report)
     assert body.startswith(MARKER + "\n")
     assert "@​octocat" in body and "@​org/team" in body and "a@b.com" in body
-    assert "`@property`" in body and "  +@property" in body and "# @someone" in body
+    assert "`@​property`" in body and "  +@property" in body and "# @someone" in body
     assert "@​again" in body
     assert "​" not in body.split("```diff")[1].split("```")[0]
+
+
+@pytest.mark.parametrize(
+    "report",
+    [
+        "``@team`",  # not a code span in GitHub: the backtick runs differ in length
+        "\\`@team`",  # an escaped backtick opens nothing
+        "`x\n`@team` y`",  # the span opened on the line before ends at the first backtick
+        "- ```\n  code\n  ```\n@team",  # a fence inside a list item, then text
+        "- a\n  ```\n  code\n@team",  # unindented text ends the list item and its fence
+        "```x`y\n@team",  # a backtick in the info string: not a fence
+        "    ```\n@team",  # indented 4: code, not a fence, and not open afterwards
+        "- a\n  ```\n  x\n     ```\n  @team",  # closed 3 columns in: GitHub closes it
+    ],
+)
+def test_mentions_that_look_like_code_but_arent(report):
+    assert "@​team" in render_body(report)
+
+
+def test_issue_references_are_defused():
+    body = render_body("see #12 and o/r#3; &#64; stays; ## heading")
+    assert "#​12" in body and "o/r#​3" in body and "&#64;" in body and "## heading" in body
 
 
 def test_longer_fences_and_tildes():
@@ -233,8 +268,27 @@ def test_long_report_is_cut_and_fence_closed():
     assert len(body) <= 2000
     assert "Report truncated" in body
     before_note = body.split("*Report truncated")[0].rstrip()
-    assert before_note.endswith("```")  # the open fence was closed
+    assert before_note.endswith("\n  ```")  # the open fence closed, at its own indent
     assert len(render_body("short", limit=2000)) < 200
+
+
+def test_cut_near_a_fence_line_keeps_fences_balanced():
+    report = "x" * 1500 + "\n```\n" + "y" * 100
+    for limit in range(1640, 1720):
+        body = render_body(report, limit=limit)
+        assert len(body) <= limit
+        fences = [ln for ln in body.splitlines() if ln == "```"]
+        assert len(fences) in (0, 2), limit  # cut on the opener: no stray closer
+
+
+@pytest.mark.parametrize("fence_len", [3, 40])
+def test_cut_always_leaves_room_for_the_closer(fence_len):
+    fence = "`" * fence_len
+    for limit in range(1100, 1200, 7):
+        report = f"  {fence}diff\n" + "\n".join("  +" + "z" * 50 for _ in range(40))
+        body = render_body(report, limit=limit)
+        assert len(body) <= limit
+        assert body.split("*Report truncated")[0].rstrip().endswith("  " + fence)
 
 
 # --- the GitHub API -------------------------------------------------------------------------
@@ -285,6 +339,9 @@ def test_api_errors():
         upsert_comment(gh, "o/r", 5, "B")
     with pytest.raises(CommentError, match="not an owner/name"):
         upsert_comment(gh, "o/r/../../x", 5, "B")
+    for bad in ("../x", "o/..", "./r"):
+        with pytest.raises(CommentError, match="not an owner/name"):
+            upsert_comment(gh, bad, 5, "B")
 
     def boom(request):
         raise httpx.ConnectError("down")

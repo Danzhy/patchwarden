@@ -1,9 +1,15 @@
 """The single patchwarden comment on a PR: created once, then updated in place on every run.
 
 The report quotes repo content and model output, so the body is treated as untrusted text:
-@mentions outside code are defused (anyone could plant one to ping a person or team), and it's
-cut to GitHub's size limit. Mentions inside code aren't notifications, and changing them there
-would corrupt the suggested diffs (`@property`), so those are left alone.
+@mentions (which ping a person or team) and #123 references (which put a "mentioned this"
+event on that issue) are defused everywhere except in fenced code, and the body is cut to
+GitHub's size limit. Fenced code is left alone because GitHub doesn't link there, and changing
+it would corrupt the suggested diffs (`@property`).
+
+Fences are tracked conservatively: when unsure whether GitHub still sees a code block, the line
+is treated as text. Inline code spans get no exception; their rules (exact backtick runs,
+backslash escapes, spans across lines) are too easy to get subtly wrong, and a zero-width space
+in an inline `@name` costs nothing.
 """
 
 import re
@@ -12,23 +18,49 @@ import httpx
 
 MARKER = "<!-- patchwarden -->"
 MAX_BODY = 65_536  # GitHub's limit for a comment body, in characters
-_MENTION = re.compile(r"(?<![\w`])@(?=[A-Za-z0-9])")
-_INLINE_CODE = re.compile(r"(`+)(?:.+?)\1")
-_FENCE = re.compile(r"\s*(`{3,}|~{3,})")
-_REPO = re.compile(r"[\w.-]+/[\w.-]+")
+_MENTION = re.compile(r"(?<![A-Za-z0-9])@(?=[A-Za-z0-9])")  # not an email's @
+_ISSUE_REF = re.compile(r"(?<!&)#(?=\d)")  # #12, o/r#12; not an HTML entity like &#64;
+_FENCE = re.compile(r"(`{3,}|~{3,})(.*)")
+_REPO = re.compile(r"(?!\.+/)[\w.-]+/(?!\.+$)[\w.-]+")  # owner/name, neither "." nor ".."
+_ZWSP = "\u200b"
 
 
 class CommentError(RuntimeError):
     pass
 
 
-def _defuse_line(line: str) -> str:
-    out, pos = [], 0
-    for m in _INLINE_CODE.finditer(line):
-        out += [_MENTION.sub("@​", line[pos : m.start()]), m.group(0)]
-        pos = m.end()
-    out.append(_MENTION.sub("@​", line[pos:]))
-    return "".join(out)
+def _defuse(line: str) -> str:
+    return _ISSUE_REF.sub("#" + _ZWSP, _MENTION.sub("@" + _ZWSP, line))
+
+
+def _indent(line: str) -> tuple[int, str]:
+    """(columns of leading whitespace, tabs to 4 like CommonMark, the rest of the line)."""
+    rest = line.lstrip(" \t")
+    return len(line[: len(line) - len(rest)].expandtabs(4)), rest
+
+
+def _opens(line: str) -> tuple[str, int] | None:
+    """(fence, indent) if `line` opens a fenced code block: at most 3 spaces of indent, and a
+    backtick fence's info string has no backtick (otherwise it's inline code, not a fence)."""
+    col, rest = _indent(line)
+    m = _FENCE.fullmatch(rest)
+    if not m or col > 3 or (m.group(1)[0] == "`" and "`" in m.group(2)):
+        return None
+    return m.group(1), col
+
+
+def _still_inside(line: str, fence: tuple[str, int]) -> bool | None:
+    """True: code. False: the closing fence. None: GitHub's block has ended some other way (a
+    line indented less than the fence leaves the list item it was in), or might have."""
+    run, at = fence
+    col, rest = _indent(line)
+    if rest and col < at:
+        return None
+    m = _FENCE.fullmatch(rest)
+    if m and m.group(1)[0] == run[0] and len(m.group(1)) >= len(run) and not m.group(2).strip():
+        # Up to 3 columns past the fence closes it in GitHub; closing early is the safe side.
+        return col > at + 3
+    return True
 
 
 def render_body(report: str, run_url: str | None = None, limit: int = MAX_BODY) -> str:
@@ -41,28 +73,31 @@ def render_body(report: str, run_url: str | None = None, limit: int = MAX_BODY) 
         )
     footer += "<sub>patchwarden: policy in code, every step traced.</sub>\n"
     cut_note = "\n\n*Report truncated to fit a GitHub comment; the full report is in the artifact.*"
-    budget = limit - len(MARKER) - 1 - len(footer) - len(cut_note) - 8  # 8: a closing fence
+    budget = limit - len(MARKER) - 1 - len(footer) - len(cut_note)
+
+    def closer(f: tuple[str, int] | None) -> str:
+        return "\n" + " " * f[1] + f[0] if f else ""
 
     lines, fence, size, cut = [], None, 0, False
     for line in report.splitlines():
-        m = _FENCE.match(line)
-        if fence is None:
-            line = _defuse_line(line) if not m else line
-            if m:
-                fence = m.group(1)
-        elif m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence):
-            if not line.strip().strip(fence[0]):  # a bare closing fence
-                fence = None
-        if size + len(line) + 1 > budget:
+        after = fence
+        inside = _still_inside(line, fence) if fence else None
+        if inside is False:
+            after = None
+        elif inside is None:
+            after = _opens(line)
+            if after is None:
+                line = _defuse(line)
+        # Room is kept for closing the fence this line leaves open, if the next one is cut.
+        if size + len(line) + 1 + len(closer(after)) > budget:
             cut = True
             break
         lines.append(line)
         size += len(line) + 1
+        fence = after
     body = "\n".join(lines)
     if cut:
-        if fence is not None:
-            body += "\n" + fence
-        body += cut_note
+        body += closer(fence) + cut_note
     return f"{MARKER}\n{body.rstrip()}{footer}"
 
 

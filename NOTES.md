@@ -416,15 +416,16 @@ Open:
   - One comment per PR. It lists the comments (paginated), updates the first one that starts
     with the marker *and* was written by a bot, and otherwise creates one. A human comment
     quoting the marker is never taken over.
-  - The body is untrusted (repo content + model output). `@mentions` get a zero-width space
-    after the `@`, but only outside code fences and inline code: GitHub doesn't notify from
-    code, and changing `@property` in a suggested diff would corrupt it.
+  - The body is untrusted (repo content + model output). `@mentions` and `#123` references
+    get a zero-width space, except inside fenced code: GitHub doesn't link there, and changing
+    `@property` in a suggested diff would corrupt it. (See the review below for why inline
+    code gets no exception.)
   - It's cut at a line boundary to fit GitHub's 65,536-character limit, closing an open fence
     and pointing to the artifact. The footer links the run.
   - 401/403/404 errors say why (fork PR, or missing `pull-requests: write`).
 - `httpx` is now a declared dependency (it was only transitive via openai), and `pyyaml` is a
   dev dependency for the workflow tests. The wheel ships the template and the prompts.
-- 267 tests, 97% coverage (`ci/comment` 98%, `ci/workflow` 100%).
+- 267 tests at the M5 commit, 97% coverage (`ci/comment` 98%, `ci/workflow` 100%).
 
 Open:
 - Not tried on a real PR yet. That needs `gh`, a throwaway public repo with the
@@ -432,3 +433,30 @@ Open:
   patchwarden itself, used as `--install "patchwarden @ git+https://github.com/OWNER/patchwarden@SHA"`.
 - Action versions (checkout v7, setup-python v7, upload-artifact v7, download-artifact v8)
   are major tags. Pinning to commit SHAs is safer; do it once the repo is public.
+
+### M5 review (2026-09-22)
+- **Mention defusing could be bypassed.** Inline code was exempt, and a per-line regex doesn't
+  match GitHub's code-span rules. The lookbehind also skipped any `@` right after a backtick.
+  So `` ``@team` `` (backtick runs of different lengths), `` \`@team` `` (escaped backtick), or
+  a span opened on the line before all reached GitHub as live pings, and Triage/Verifier
+  reasons in the report are model output that a prompt injection can shape. Now only fenced
+  code is exempt, and fences follow CommonMark more closely, erring toward "text":
+  - An opener has at most 3 spaces of indent and no backtick in a backtick fence's info string.
+  - A closer can be up to 3 columns past the opener.
+  - A line indented less than the fence ends it, because it leaves the list item the fence was
+    in.
+  - Tabs count as 4 columns.
+  `#123` and `o/r#123` are defused too, since they put "mentioned this" events on other issues.
+- **Truncation** reserved a fixed 8 characters for the closing fence. The reporter's fences can
+  be longer, and they're indented inside list items; a top-level closer would end the list item
+  and open a *new* fence around the footer. Now it reserves the real closer and writes it at the
+  fence's own indent. A fence opened on the line where the cut lands gets no closer.
+- **`always()` → `!cancelled()`** on the upload and the comment job. `always()` also runs after
+  concurrency cancels a superseded run, so a stale report could overwrite the newer comment.
+- **The comment job now runs only when fix exits 0 or 1.** Exit 2 writes no report, and the
+  job failed a second time on the missing file.
+- The step summary is capped at 1 MB, GitHub's limit.
+- `init-ci` refuses a path that isn't the top of its git repo. GitHub only reads workflows
+  there, so it used to write one that never ran.
+- The repo-slug check also refuses `.`/`..` components.
+- 280 tests; actionlint clean.

@@ -198,9 +198,13 @@ def init_ci(
     force: Annotated[bool, typer.Option("--force", help="Overwrite an existing workflow.")] = False,
 ) -> None:
     """Write .github/workflows/patchwarden.yml: fix every PR, one PR comment, a trace artifact."""
-    from patchwarden.ci.workflow import WORKFLOW_PATH, InitCIError, render_workflow
+    from patchwarden.ci.workflow import WORKFLOW_PATH, InitCIError, not_repo_root, render_workflow
     from patchwarden.ci.workflow import default_branch as detect_branch
 
+    wrong_place = not_repo_root(repo)
+    if wrong_place:
+        typer.echo(f"error: {wrong_place}; run init-ci at the top", err=True)
+        raise typer.Exit(2)
     target = repo / WORKFLOW_PATH
     if target.exists() and not force:
         typer.echo(f"error: {target} exists (use --force to overwrite)", err=True)

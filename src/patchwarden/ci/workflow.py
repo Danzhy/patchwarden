@@ -21,6 +21,17 @@ def default_branch(repo: Path) -> str:
     return out.strip().removeprefix("origin/") if out and out.strip() else "main"
 
 
+def not_repo_root(repo: Path) -> str | None:
+    """Why `repo` is the wrong place for the workflow, or None. GitHub only reads
+    .github/workflows at the top of the repository, and the workflow runs `fix .` there."""
+    top = _git(repo, "rev-parse", "--show-toplevel")
+    if top is None:
+        return None  # not a git repo (yet): nothing to compare against
+    if Path(top.strip()).resolve() != repo.resolve():
+        return f"{repo} is not the top of its git repository ({top.strip()})"
+    return None
+
+
 def render_workflow(install: str, branch: str) -> str:
     """The template with the pip install spec and the default branch filled in. Both land in
     YAML (single-quoted) and in shell via env, so they are checked, not escaped."""

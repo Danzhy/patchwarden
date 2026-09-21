@@ -93,12 +93,13 @@ jobs:
           code=$?
           set -e
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          if [ -f "$OUT/patchwarden-report.md" ]; then
-            cat "$OUT/patchwarden-report.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "$OUT/patchwarden-report.md" ]; then  # a summary may be at most 1 MiB
+            head -c 1000000 "$OUT/patchwarden-report.md" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload the patch, report and trace
-        if: always()
+        # Not always(): that also runs when a newer push cancels this run.
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: patchwarden
@@ -119,10 +120,12 @@ jobs:
 
   comment:
     needs: fix
+    # Also when the check failed (escalations), not when cancelled; and only if fix finished
+    # with a report (exit 0 or 1; on 2, the fix job's log says what went wrong).
     if: >-
-      always() && github.event_name == 'pull_request'
+      !cancelled() && github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository
-      && needs.fix.outputs.exit_code != ''
+      && (needs.fix.outputs.exit_code == '0' || needs.fix.outputs.exit_code == '1')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
