@@ -104,3 +104,28 @@ Consequences for `llm.py` (M3):
 - Treat `finish_reason == "length"` with empty content as its own error
   (`llm_truncated`, logged as a `step_error`), separate from `invalid_json_from_llm`.
 - Take cost from `usage.cost`, and record `reasoning_tokens` in the step's trace row.
+
+## M1: `scan` (2026-09-21)
+- Pipeline (`scan.py`): scope → analyzers → SARIF → `Finding` → `policy.pre_classify` → report.
+  `patchwarden scan tests/fixtures/repo_small` finds 15: escalate 3 (bandit), protected 1 (F401 in
+  `app/auth/`), auto-fix 8, triage 3 (SIM103 ×2, B006). Scan never writes to the repo (tested).
+- Rule ids are namespaced (`ruff:F401`, `bandit:B602`, `codeql:py/unused-import`) and config
+  patterns are `fnmatch` globs over them. **Pitfall found on the first run:** `ruff:S*` (meant for
+  ruff's flake8-bandit S-rules) also matches `ruff:SIM103`, so a simplification got escalated as
+  security. The default is now `ruff:S[0-9]*`, with a regression test.
+- Path globs: fnmatch's `*` crosses `/`; each path is also matched as `"/" + path`, so
+  `**/auth/**` covers a top-level `auth/` too, while `app/oauth/` doesn't match.
+- Fingerprint = sha256(tool, rule, file, CodeQL line hash or whitespace-normalised snippet), 16
+  hex chars. No line numbers, so it survives code moving above it. Identical rule+snippet in one
+  file: the 2nd, 3rd... by line get `:2`, `:3`; the first keeps the bare hash.
+- Ruff runs with `--isolated` and patchwarden's `ruff_select`, so the target repo's ruff config
+  doesn't change what's reported (keeps evals reproducible). Bandit skips `test_paths` (B101 fires
+  on every `assert`). Tools run as `sys.executable -m ruff|bandit`, i.e. the venv's versions.
+- Config: unknown `[tool.patchwarden]` keys and wrong types (including `true` for an int) are
+  errors, exit code 2. Keys used by later milestones (`test_command`, `max_fix_rounds`,
+  `budget_usd`, `models`...) are already in the schema.
+- CodeQL: off by default (`analyzers = ["ruff", "bandit", "codeql"]` to enable; `codeql_queries`
+  to choose queries). Checked for real on the fixture: the code-scanning suite finds nothing (as in
+  M0) and `UnusedImport.ql` finds the 3 unused imports with correct paths/snippets, ~23 s. Tests
+  use a fake `codeql` script.
+- 61 tests, 96% line coverage overall, 100% on `policy.py` and `config.py`.

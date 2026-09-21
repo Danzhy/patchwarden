@@ -1,0 +1,39 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {"driver": {"name": "CodeQL"}},
+      "results": [
+        {
+          "ruleId": "py/unused-import",
+          "rule": {"id": "py/unused-import", "index": 0},
+          "message": {"text": "Import of 'os' is not used."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "app/utils.py", "uriBaseId": "%SRCROOT%", "index": 0},
+                "region": {"startLine": 1, "startColumn": 1, "endColumn": 10}
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "5d2a8f0e3c1b9a77:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          }
+        },
+        {
+          "ruleId": "py/flask-debug",
+          "message": {"text": "A Flask app appears to be run in debug mode."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "../outside.py", "uriBaseId": "%SRCROOT%"},
+                "region": {"startLine": 3}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
