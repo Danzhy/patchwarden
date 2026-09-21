@@ -7,6 +7,7 @@ patterns are fnmatch globs over repo-relative POSIX paths (see scope.match_path)
 import dataclasses
 import hashlib
 import json
+import subprocess
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -107,10 +108,39 @@ def load_config(repo: Path) -> Config:
     pyproject = repo / "pyproject.toml"
     if not pyproject.is_file():
         return Config()
+    return _parse(pyproject.read_text(), str(pyproject))
+
+
+def load_config_at(repo: Path, ref: str) -> tuple[Config, str | None]:
+    """The config as committed at git `ref`, not as in the working tree. (config, warning)
+
+    CI passes the PR's base branch: the policy is the reviewer's, so a PR can't loosen the
+    rules it's checked against (or change the test_command) by editing its own pyproject.
+    """
+
+    def git(*args: str) -> subprocess.CompletedProcess:
+        try:
+            return subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True)
+        except OSError as e:
+            raise ConfigError(f"--config-from needs git: {e}") from e
+
+    # A leading "-" would be read as an option.
+    if (
+        ref.startswith("-")
+        or git("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}").returncode
+    ):
+        raise ConfigError(f"--config-from: {ref!r} is not a commit in {repo}")
+    shown = git("show", f"{ref}:./pyproject.toml")  # ./ : relative to `repo`, not the git root
+    if shown.returncode != 0:
+        return Config(), f"no pyproject.toml at {ref}; using the default policy"
+    return _parse(shown.stdout, f"{ref}:pyproject.toml"), None
+
+
+def _parse(text: str, where: str) -> Config:
     try:
-        data = tomllib.loads(pyproject.read_text())
+        data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as e:
-        raise ConfigError(f"{pyproject}: {e}") from e
+        raise ConfigError(f"{where}: {e}") from e
     return from_dict(data.get("tool", {}).get("patchwarden", {}))
 
 

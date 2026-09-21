@@ -1,0 +1,151 @@
+# Written by `patchwarden init-ci`. On every PR (and push to a branch other than
+# @@DEFAULT_BRANCH@@), patchwarden fixes static-analysis warnings in the changed .py files and
+# posts one PR comment: what it fixed, what it only suggests, and what needs a human.
+# The patch, report and trace are uploaded as the `patchwarden` artifact.
+#
+# Setup: add the repo secret OPENROUTER_API_KEY, and set `test_command` under
+# [tool.patchwarden] in pyproject.toml (without tests, LLM fixes are only ever suggested).
+# Repo variables: PATCHWARDEN_FAIL_ON_ESCALATION=true fails the check when something is
+# escalated. PATCHWARDEN_LLM_ON_PUSH=true also uses the LLM on pushes; by default they get a
+# ruff-only run, because a push to a PR branch also triggers `pull_request`, and paying twice
+# for the same commit buys nothing.
+#
+# Security:
+# - `pull_request`, never `pull_request_target`: fork PRs get no secrets and a read-only token.
+# - The `fix` job runs the PR's code (test_command) with a read-only token that isn't left in
+#   .git/config. The OpenRouter key is only passed for same-repo PRs (and opted-in pushes),
+#   whose authors can already edit this workflow; fork PRs get a ruff-only run.
+# - The policy ([tool.patchwarden]) is read from the base branch, so a PR can't loosen it.
+# - Only the `comment` job can write, and it never checks out or runs the PR's code.
+name: patchwarden
+
+on:
+  pull_request:
+  push:
+    branches-ignore: ['@@DEFAULT_BRANCH@@']
+
+permissions: {}
+
+concurrency:
+  group: patchwarden-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PATCHWARDEN_SPEC: '@@INSTALL@@'
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      exit_code: ${{ steps.fix.outputs.exit_code }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The PR's head commit, not GitHub's merge commit, so the patch applies to the branch.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install patchwarden
+        # In its own venv, outside the checkout: the project's dependencies can't clash with it,
+        # and its `python` doesn't shadow the project's in test_command.
+        run: |
+          python -m venv "$RUNNER_TEMP/pw"
+          "$RUNNER_TEMP/pw/bin/pip" install --quiet "$PATCHWARDEN_SPEC"
+          echo "PW=$RUNNER_TEMP/pw/bin" >> "$GITHUB_ENV"
+
+      - name: Install the project's test dependencies
+        # Edit to match what your test_command needs.
+        run: |
+          if [ -f requirements.txt ]; then pip install --quiet -r requirements.txt; fi
+          if [ -f setup.py ] || grep -q '^\[build-system\]' pyproject.toml 2>/dev/null; then
+            pip install --quiet -e . || echo "::warning::pip install -e . failed"
+          fi
+          pip install --quiet pytest
+
+      - name: Run patchwarden
+        id: fix
+        env:
+          # Same-repo PRs only (pushes if PATCHWARDEN_LLM_ON_PUSH=true); see the top of the file.
+          OPENROUTER_API_KEY: >-
+            ${{ ((github.event_name == 'push' && vars.PATCHWARDEN_LLM_ON_PUSH == 'true')
+                 || github.event.pull_request.head.repo.full_name == github.repository)
+                && secrets.OPENROUTER_API_KEY || '' }}
+          BASE: ${{ github.base_ref || github.event.repository.default_branch }}
+          OUT: ${{ runner.temp }}/patchwarden
+        run: |
+          args=(--base "origin/$BASE" --config-from "origin/$BASE"
+                --output "$OUT/patchwarden.patch" --report "$OUT/patchwarden-report.md"
+                --trace-dir "$OUT/trace")
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "::notice::No OPENROUTER_API_KEY for this run (a push, a fork PR, or the secret isn't set): ruff's safe fixes only, no LLM."
+            args+=(--no-llm)
+          fi
+          set +e
+          "$PW/patchwarden" fix . "${args[@]}"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ -f "$OUT/patchwarden-report.md" ]; then
+            cat "$OUT/patchwarden-report.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload the patch, report and trace
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: patchwarden
+          path: ${{ runner.temp }}/patchwarden/
+          if-no-files-found: warn
+
+      - name: Check the result
+        env:
+          CODE: ${{ steps.fix.outputs.exit_code }}
+          FAIL_ON_ESCALATION: ${{ vars.PATCHWARDEN_FAIL_ON_ESCALATION }}
+        run: |
+          if [ "$CODE" = 2 ]; then
+            echo "::error::patchwarden failed; see the log of the step above."; exit 1
+          fi
+          if [ "$CODE" = 1 ] && [ "$FAIL_ON_ESCALATION" = true ]; then
+            echo "::error::patchwarden escalated findings that need a human."; exit 1
+          fi
+
+  comment:
+    needs: fix
+    if: >-
+      always() && github.event_name == 'pull_request'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && needs.fix.outputs.exit_code != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install patchwarden
+        run: |
+          python -m venv "$RUNNER_TEMP/pw"
+          "$RUNNER_TEMP/pw/bin/pip" install --quiet "$PATCHWARDEN_SPEC"
+          echo "PW=$RUNNER_TEMP/pw/bin" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: patchwarden
+          path: ${{ runner.temp }}/patchwarden
+
+      - name: Post or update the PR comment
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPORT: ${{ runner.temp }}/patchwarden/patchwarden-report.md
+        run: '"$PW/patchwarden" comment "$REPORT" --pr "$PR_NUMBER"'

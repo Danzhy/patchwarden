@@ -370,10 +370,65 @@ suggested, 5 escalated, exit 1. Flags: `round_limit_hit` ×1, `triage_policy_dis
   (one took 19.6 s).
 
 Open:
-- M5: set `persist-credentials: false` on checkout, so a PR's test_command can't read the
-  token from `.git/config`. Removing it from the environment isn't enough.
 - Findings in files ruff fixed are reported at post-ruff line numbers, while ruff's own fixed
   findings keep their original lines. It's consistent within a file's state, but mixed in the
   report.
 - Test runs add up: one per fix round, plus the baseline and the post-ruff run. M6 on big repos
   needs `test_timeout_s` and a fast test subset.
+
+## M5: CI: `init-ci`, the workflow, the PR comment (2026-09-22)
+- `patchwarden init-ci [REPO] [--install SPEC] [--default-branch B] [--force]` writes
+  `.github/workflows/patchwarden.yml` from `ci/workflow_template.yml`. The install spec and
+  branch are validated, not escaped: they land in single-quoted YAML and in shell via env.
+  The default branch comes from `origin/HEAD`, else `main`.
+- **The workflow** (`pull_request` + `push` to non-default branches; `actionlint` clean):
+  - Top-level `permissions: {}`. Two jobs:
+    - `fix`: `contents: read`. Checks out the PR's *head* commit (not the merge commit, so the
+      patch applies to the branch) with `fetch-depth: 0` and `persist-credentials: false`.
+      Runs `fix --base origin/$BASE --config-from origin/$BASE`, then puts the report in the
+      job summary, uploads the patch, report and trace as the `patchwarden` artifact, and
+      fails on exit 2 (or on exit 1 if `PATCHWARDEN_FAIL_ON_ESCALATION=true`).
+    - `comment`: `pull-requests: write`. Never checks out or runs PR code: it installs
+      patchwarden from the pinned spec, downloads the artifact and runs `patchwarden comment`.
+  - patchwarden gets its own venv under `$RUNNER_TEMP`, called by full path, so its `python`
+    doesn't shadow the project's in `test_command` (the M4 real-run lesson).
+  - The trace dir is `trace/`, not `.patchwarden/`: upload-artifact skips hidden files.
+  - Event data reaches scripts only through `env`, never `${{ }}` inside `run:` (script
+    injection). A test checks this.
+- **Threat model** for the code the `fix` job runs (the PR's test_command):
+  - Fork PRs: `pull_request` gives them no secrets and a read-only token. The key expression
+    is also explicitly `head.repo.full_name == github.repository`, so even the private-repo
+    setting "send secrets to fork PRs" doesn't hand the key to fork code. Fork PRs get a
+    `--no-llm` run and no comment (their token can't write one).
+  - Same-repo PRs: the author can edit this workflow anyway, so running their tests with the
+    key present grants nothing new. `scrubbed_env` removes the key from the test process, but
+    on Linux a same-user child could still read `/proc/<ppid>/environ`; that's accepted here.
+  - `persist-credentials: false`: the token isn't left in `.git/config` for test code to read.
+    The fix job's token is read-only anyway, and the writing job runs no PR code.
+  - `--config-from REF` (new, also on `scan`) reads `[tool.patchwarden]` from `git show
+    REF:./pyproject.toml`, so a PR can't loosen the policy it's judged by (for example
+    `exclude = ["**"]`, or empty `always_escalate`) or swap the test_command. No pyproject at
+    the ref → defaults plus a warning. A ref starting with `-` is refused (option injection).
+    Not covered: `[tool.ruff]` in the PR's pyproject still configures ruff itself.
+- **Push runs are ruff-only by default** (`PATCHWARDEN_LLM_ON_PUSH=true` opts in). A push to a
+  PR branch also triggers `pull_request`, and the LLM run would be paid twice per commit.
+- **The comment** (`ci/comment.py`, httpx, marker `<!-- patchwarden -->`):
+  - One comment per PR. It lists the comments (paginated), updates the first one that starts
+    with the marker *and* was written by a bot, and otherwise creates one. A human comment
+    quoting the marker is never taken over.
+  - The body is untrusted (repo content + model output). `@mentions` get a zero-width space
+    after the `@`, but only outside code fences and inline code: GitHub doesn't notify from
+    code, and changing `@property` in a suggested diff would corrupt it.
+  - It's cut at a line boundary to fit GitHub's 65,536-character limit, closing an open fence
+    and pointing to the artifact. The footer links the run.
+  - 401/403/404 errors say why (fork PR, or missing `pull-requests: write`).
+- `httpx` is now a declared dependency (it was only transitive via openai), and `pyyaml` is a
+  dev dependency for the workflow tests. The wheel ships the template and the prompts.
+- 267 tests, 97% coverage (`ci/comment` 98%, `ci/workflow` 100%).
+
+Open:
+- Not tried on a real PR yet. That needs `gh`, a throwaway public repo with the
+  OPENROUTER_API_KEY secret, and patchwarden installable from CI: a public GitHub repo for
+  patchwarden itself, used as `--install "patchwarden @ git+https://github.com/OWNER/patchwarden@SHA"`.
+- Action versions (checkout v7, setup-python v7, upload-artifact v7, download-artifact v8)
+  are major tags. Pinning to commit SHAs is safer; do it once the repo is public.

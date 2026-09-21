@@ -11,6 +11,13 @@ trace_app = typer.Typer(help="Inspect runs in the trace store.", no_args_is_help
 app.add_typer(trace_app, name="trace")
 
 TraceDir = Annotated[Path, typer.Option(help="Trace store directory (traces.db + runs/*.jsonl).")]
+ConfigFrom = Annotated[
+    str | None,
+    typer.Option(
+        help="Read [tool.patchwarden] from pyproject.toml at this git ref (CI: the base branch), "
+        "not from the working tree."
+    ),
+]
 
 
 class OutputFormat(StrEnum):
@@ -40,6 +47,7 @@ def scan(
     output: Annotated[
         Path | None, typer.Option(help="Write the report here instead of stdout.")
     ] = None,
+    config_from: ConfigFrom = None,
 ) -> None:
     """Analyze and pre-classify findings; print the report. Never modifies the repo."""
     from patchwarden.agents.reporter import render_scan_text
@@ -48,10 +56,13 @@ def scan(
     from patchwarden.scan import scan as run_scan
 
     try:
-        result, warnings = run_scan(repo, base=base)
+        cfg, cfg_warning = _config(repo, config_from)
+        result, warnings = run_scan(repo, base=base, cfg=cfg)
     except (ConfigError, AnalyzerError) as e:
         typer.echo(f"error: {e}", err=True)
         raise typer.Exit(2) from e
+    for w in [cfg_warning] if cfg_warning else []:
+        typer.echo(f"warning: {w}", err=True)
     for w in warnings:
         typer.echo(f"warning: {w}", err=True)
     text = (
@@ -89,6 +100,7 @@ def fix(
     budget_usd: Annotated[
         float | None, typer.Option(help="Stop calling the LLM after this much spend (USD).")
     ] = None,
+    config_from: ConfigFrom = None,
 ) -> None:
     """Fix findings in a temporary copy; write a patch and a report. The repo changes only
     with --apply. Exit code 1 if anything needs a human (escalated or not fixable)."""
@@ -96,7 +108,7 @@ def fix(
     from collections import Counter
 
     from patchwarden.analyzers import AnalyzerError
-    from patchwarden.config import ConfigError, load_config
+    from patchwarden.config import ConfigError
     from patchwarden.llm import LLMError
     from patchwarden.models import FindingStatus
     from patchwarden.pipeline import run_fix
@@ -104,7 +116,9 @@ def fix(
     from patchwarden.workspace import WorkspaceError
 
     try:
-        cfg = load_config(repo.resolve())
+        cfg, cfg_warning = _config(repo, config_from)
+        if cfg_warning:
+            typer.echo(f"warning: {cfg_warning}", err=True)
         if budget_usd is not None:
             cfg = dataclasses.replace(cfg, budget_usd=budget_usd)
         store = TraceStore(trace_dir)
@@ -154,6 +168,109 @@ def fix(
         raise typer.Exit(2)
     if res.needs_human:
         raise typer.Exit(1)
+
+
+def _config(repo: Path, config_from: str | None):
+    """(config, warning): from the working tree, or from git ref `config_from`."""
+    from patchwarden.config import load_config, load_config_at
+
+    if config_from:
+        return load_config_at(repo.resolve(), config_from)
+    return load_config(repo.resolve()), None
+
+
+@app.command("init-ci")
+def init_ci(
+    repo: Annotated[
+        Path, typer.Argument(exists=True, file_okay=False, help="Repository to set up.")
+    ] = Path("."),
+    install: Annotated[
+        str,
+        typer.Option(
+            help="What CI pip-installs, e.g. 'patchwarden==0.1.0' or "
+            "'patchwarden @ git+https://github.com/OWNER/patchwarden@TAG'."
+        ),
+    ] = "patchwarden",
+    default_branch: Annotated[
+        str | None,
+        typer.Option(help="Branch whose pushes are skipped. Default: origin's, else main."),
+    ] = None,
+    force: Annotated[bool, typer.Option("--force", help="Overwrite an existing workflow.")] = False,
+) -> None:
+    """Write .github/workflows/patchwarden.yml: fix every PR, one PR comment, a trace artifact."""
+    from patchwarden.ci.workflow import WORKFLOW_PATH, InitCIError, render_workflow
+    from patchwarden.ci.workflow import default_branch as detect_branch
+
+    target = repo / WORKFLOW_PATH
+    if target.exists() and not force:
+        typer.echo(f"error: {target} exists (use --force to overwrite)", err=True)
+        raise typer.Exit(2)
+    try:
+        text = render_workflow(install, default_branch or detect_branch(repo))
+    except InitCIError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(2) from e
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text)
+    typer.echo(f"wrote {target}")
+    typer.echo(
+        "next:\n"
+        "  1. add the repo secret OPENROUTER_API_KEY "
+        "(gh secret set OPENROUTER_API_KEY)\n"
+        '  2. set test_command under [tool.patchwarden] in pyproject.toml, e.g. "pytest -q";\n'
+        "     without it, LLM fixes are only suggested\n"
+        "  3. commit the workflow on the default branch: PRs read the policy from there"
+    )
+
+
+@app.command()
+def comment(
+    report: Annotated[
+        Path, typer.Argument(exists=True, dir_okay=False, help="The markdown report from fix.")
+    ],
+    pr: Annotated[
+        int | None, typer.Option(help="PR number. Default: from GITHUB_EVENT_PATH.")
+    ] = None,
+    repo_slug: Annotated[
+        str | None, typer.Option("--repo", help="owner/name. Default: GITHUB_REPOSITORY.")
+    ] = None,
+) -> None:
+    """Post the report as the PR's patchwarden comment, or update it (CI; needs GITHUB_TOKEN)."""
+    import json
+    import os
+
+    from patchwarden.ci.comment import CommentError, GitHub, render_body, upsert_comment
+
+    env = os.environ
+    repo_slug = repo_slug or env.get("GITHUB_REPOSITORY")
+    if pr is None and env.get("GITHUB_EVENT_PATH"):
+        try:
+            event = json.loads(Path(env["GITHUB_EVENT_PATH"]).read_text())
+            pr = (event.get("pull_request") or {}).get("number")
+        except (OSError, ValueError):
+            pr = None
+    token = env.get("GITHUB_TOKEN")
+    missing = [
+        name
+        for name, value in (("GITHUB_TOKEN", token), ("--repo", repo_slug), ("--pr", pr))
+        if not value
+    ]
+    if missing:
+        typer.echo(f"error: comment needs {', '.join(missing)}", err=True)
+        raise typer.Exit(2)
+    run_url = None
+    if env.get("GITHUB_RUN_ID"):
+        server = env.get("GITHUB_SERVER_URL", "https://github.com")
+        run_url = f"{server}/{repo_slug}/actions/runs/{env['GITHUB_RUN_ID']}"
+    gh = GitHub(token, env.get("GITHUB_API_URL", "https://api.github.com"))
+    try:
+        action, url = upsert_comment(gh, repo_slug, pr, render_body(report.read_text(), run_url))
+    except CommentError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(2) from e
+    finally:
+        gh.close()
+    typer.echo(f"{action} {url}")
 
 
 def make_llm(cfg, run):
