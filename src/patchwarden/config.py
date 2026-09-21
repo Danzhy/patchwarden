@@ -126,7 +126,10 @@ def from_dict(raw: dict) -> Config:
         )
         if not ok:
             raise ConfigError(f"[tool.patchwarden] {key}: expected {expected.__name__}")
-    for key in ("models", "reasoning"):  # partial tables are merged onto the defaults
+    for key, kind in (("models", str), ("reasoning", bool)):  # merged onto the defaults
         if key in raw:
+            bad = [k for k, v in raw[key].items() if not isinstance(v, kind)]
+            if bad:
+                raise ConfigError(f"[tool.patchwarden] {key}.{bad[0]}: expected {kind.__name__}")
             raw = {**raw, key: {**getattr(defaults, key), **raw[key]}}
     return dataclasses.replace(defaults, **raw)

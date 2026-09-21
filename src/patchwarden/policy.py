@@ -24,6 +24,7 @@ from patchwarden.models import (
     ViolationKind,
 )
 from patchwarden.scope import is_test_path, match_path
+from patchwarden.workspace import split_lines
 
 
 def match_rule(rule_id: str, patterns: list[str]) -> str | None:
@@ -148,8 +149,10 @@ def check_diff(
 
 
 def changed_line_count(before: str, after: str) -> int:
-    diff = difflib.unified_diff(before.splitlines(), after.splitlines(), lineterm="", n=0)
-    return sum(1 for ln in diff if ln[:1] in "+-" and not ln.startswith(("+++", "---")))
+    """Removed plus added lines. From the opcodes, not diff text, where a removed line that
+    itself starts with "--" (an rst underline) would look like a "---" header."""
+    sm = difflib.SequenceMatcher(None, split_lines(before), split_lines(after), autojunk=False)
+    return sum(i2 - i1 + j2 - j1 for tag, i1, i2, j1, j2 in sm.get_opcodes() if tag != "equal")
 
 
 def _comments(text: str) -> list[str]:

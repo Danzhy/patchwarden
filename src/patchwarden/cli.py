@@ -105,9 +105,12 @@ def fix(
         if budget_usd is not None:
             cfg = dataclasses.replace(cfg, budget_usd=budget_usd)
         store = TraceStore(trace_dir)
-        res = run_fix(
-            repo, cfg, store=store, llm_factory=make_llm, base=base, no_llm=no_llm, apply=apply
-        )
+        try:
+            res = run_fix(
+                repo, cfg, store=store, llm_factory=make_llm, base=base, no_llm=no_llm, apply=apply
+            )
+        finally:
+            store.close()
     except (ConfigError, AnalyzerError, WorkspaceError, LLMError) as e:
         typer.echo(f"error: {e}", err=True)
         raise typer.Exit(2) from e
@@ -116,6 +119,8 @@ def fix(
         typer.echo(f"warning: {w}", err=True)
     for file, why in res.reverted.items():
         typer.echo(f"reverted ruff's fix in {file}: {why}", err=True)
+    for path in (output, report):
+        path.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(res.patch)
     report.write_text(res.report(str(output)))
 
@@ -134,6 +139,9 @@ def fix(
     typer.echo(f"trace: {res.run_id} in {trace_dir} (cost ${res.cost_usd:.4f}, {res.outcome})")
     if res.applied:
         typer.echo(f"applied to {len(res.applied)} files: {', '.join(res.applied)}")
+    if res.apply_error:
+        typer.echo(f"error: --apply refused, nothing written: {res.apply_error}", err=True)
+        raise typer.Exit(2)
     if res.needs_human:
         raise typer.Exit(1)
 

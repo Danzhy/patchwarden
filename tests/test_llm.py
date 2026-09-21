@@ -79,6 +79,20 @@ def test_truncated_reply(run):
     assert llm_steps(run)[0]["reasoning_tokens"] == 800
 
 
+def test_truncated_reply_with_partial_content(run):
+    c, _ = client(run, RawReply('{"decision": "sugg', "length", "m", tokens_out=800))
+    with pytest.raises(LLMError) as e:
+        c.complete("triage", MSGS, schema=TriageOutput)
+    assert e.value.kind == "llm_truncated"
+
+
+def test_budget_is_checked_before_the_repair_turn(run):
+    c, t = client(run, ["nope", triage_json("auto_fix")], budget_usd=0.001)
+    with pytest.raises(BudgetExceeded):
+        c.complete("triage", MSGS, schema=TriageOutput)
+    assert len(t.calls) == 1
+
+
 def test_transient_errors_are_retried(run):
     c, t = client(run, [TransientLLMError("429"), TransientLLMError("502"), "plain text"])
     slept = []
@@ -186,7 +200,8 @@ def test_openrouter_plain_text_has_no_response_format():
 
 
 @pytest.mark.parametrize(
-    ("status", "exc"), [(429, TransientLLMError), (503, TransientLLMError), (400, LLMError)]
+    ("status", "exc"),
+    [(429, TransientLLMError), (408, TransientLLMError), (503, TransientLLMError), (400, LLMError)],
 )
 def test_openrouter_errors(status, exc):
     def handler(request):

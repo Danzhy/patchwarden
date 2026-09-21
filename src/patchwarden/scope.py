@@ -37,22 +37,25 @@ def all_python_files(repo: Path, cfg: Config) -> list[str]:
     return sorted(out)
 
 
+def _git(repo: Path, *args: str) -> str | None:
+    """git's stdout, or None if it fails or git isn't installed (a bare CI image)."""
+    try:
+        proc = subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True)
+    except OSError:
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
 def changed_python_files(repo: Path, base: str, cfg: Config) -> list[str] | None:
     """Added/modified .py files in `base...HEAD`, or None if that can't be computed."""
-    proc = subprocess.run(
-        ["git", "diff", "--name-only", "--diff-filter=d", f"{base}...HEAD", "--", "*.py"],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-    )
-    if proc.returncode != 0:
+    stdout = _git(repo, "diff", "--name-only", "--diff-filter=d", f"{base}...HEAD", "--", "*.py")
+    top = _git(repo, "rev-parse", "--show-toplevel")
+    if stdout is None or top is None:
         return None
     # git prints paths relative to the repo top level; make them relative to `repo`.
-    top = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], cwd=repo, capture_output=True, text=True
-    ).stdout.strip()
+    top = top.strip()
     out = []
-    for line in proc.stdout.splitlines():
+    for line in stdout.splitlines():
         p = (Path(top) / line).resolve()
         try:
             rel = p.relative_to(repo.resolve()).as_posix()
@@ -76,5 +79,5 @@ def files_in_scope(repo: Path, cfg: Config, base: str | None) -> tuple[list[str]
 
 def git_sha(repo: Path) -> str | None:
     """HEAD's commit, or None outside a git repo (recorded with each run)."""
-    proc = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True)
-    return proc.stdout.strip() if proc.returncode == 0 else None
+    out = _git(repo, "rev-parse", "HEAD")
+    return out.strip() if out else None

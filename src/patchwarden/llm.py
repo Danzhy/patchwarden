@@ -97,7 +97,7 @@ class OpenRouterTransport:
         except (openai.RateLimitError, openai.APIConnectionError, openai.InternalServerError) as e:
             raise TransientLLMError(str(e)) from e
         except openai.APIStatusError as e:
-            if e.status_code >= 500:
+            if e.status_code >= 500 or e.status_code == 408:
                 raise TransientLLMError(str(e)) from e
             raise LLMError("api_error", f"HTTP {e.status_code}: {e.message}") from e
         if not resp.choices:  # OpenRouter sometimes returns 200 with an error body
@@ -171,6 +171,8 @@ class LLMClient:
             convo = list(messages)
             replies: list[str] = []
             for turn in range(2 if schema else 1):  # schema: one repair turn
+                if turn and self.spent >= self.budget:
+                    raise BudgetExceeded(self.spent, self.budget)
                 raw, n = self._send(role, model, convo, json_mode=schema is not None)
                 attempts += n
                 step.model = raw.model or model
@@ -180,11 +182,13 @@ class LLMClient:
                 step.cost += raw.cost
                 self.spent += raw.cost
                 step.output = {"replies": replies, "attempts": attempts}
-                if not raw.content:
+                if raw.finish_reason == "length":
+                    # Even with some content: a cut-off edit block or JSON is never used.
                     raise LLMError(
-                        "llm_truncated" if raw.finish_reason == "length" else "api_error",
-                        f"empty reply (finish_reason={raw.finish_reason})",
+                        "llm_truncated", f"hit max_tokens ({len(raw.content or '')} chars)"
                     )
+                if not raw.content:
+                    raise LLMError("api_error", f"empty reply (finish_reason={raw.finish_reason})")
                 replies.append(raw.content)
                 if schema is None:
                     return LLMReply(raw.content, None, step.cost)

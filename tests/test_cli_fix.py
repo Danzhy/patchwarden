@@ -211,3 +211,20 @@ def test_fix_bad_config_exits_2(tmp_path):
     (tmp_path / "pyproject.toml").write_text("[tool.patchwarden]\nnope = 1\n")
     res = runner.invoke(app, ["fix", str(tmp_path), "--output", str(tmp_path / "p")])
     assert res.exit_code == 2
+
+
+def test_outputs_in_missing_directories_are_created(tmp_path):
+    res = runner.invoke(
+        app,
+        [
+            "fix",
+            str(copy_repo(tmp_path)),
+            "--no-llm",
+            "--output",
+            "out/a/p.patch",
+            "--report",
+            "out/b/r.md",
+        ],
+    )
+    assert res.exit_code == 1, res.output
+    assert (tmp_path / "out/a/p.patch").is_file() and (tmp_path / "out/b/r.md").is_file()

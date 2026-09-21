@@ -1,6 +1,7 @@
 """Reporter: plain templates, no LLM. `scan` gets a text report, `fix` a markdown report with
 Auto-fixed / Suggested / Escalated / False-positive sections (also the future PR comment)."""
 
+import re
 from collections import Counter
 
 from patchwarden.models import FindingOutcome, FindingStatus, PreClassKind, ScanResult
@@ -46,12 +47,23 @@ def render_scan_text(result: ScanResult) -> str:
     return "\n".join(out) + "\n"
 
 
+def _inline(text: str, limit: int = 500) -> str:
+    """Model and analyzer text on one line: it can't start a heading, list or fence of its own
+    in the report (the future PR comment), and `<` can't open HTML such as a fake marker."""
+    one = " ".join(text.split()).replace("<", "&lt;")
+    return one if len(one) <= limit else one[:limit].rstrip() + "…"
+
+
 def _line(o: FindingOutcome) -> str:
-    return f"`{o.finding.location}` **{o.finding.rule_id}**: {o.finding.message}"
+    return f"`{o.finding.location}` **{o.finding.rule_id}**: {_inline(o.finding.message)}"
 
 
 def _diff_block(diff: str) -> list[str]:
-    return ["", "  ```diff", *("  " + ln for ln in diff.rstrip("\n").splitlines()), "  ```"]
+    # Longer than any backtick run in the diff, so the diff can't close the fence.
+    runs = [len(m) for m in re.findall(r"`+", diff)]
+    fence = "`" * max(3, max(runs, default=0) + 1)
+    body = ("  " + ln for ln in diff.rstrip("\n").split("\n"))
+    return ["", f"  {fence}diff", *body, f"  {fence}"]
 
 
 def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
@@ -83,7 +95,11 @@ def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
         out.append(f"All of these are in `{run['patch']}`.")
         out.append("")
     for o in by[FindingStatus.fixed]:
-        how = "ruff (safe fix)" if o.fixed_by == "ruff" else f"Fixer: {o.rationale or o.reason}"
+        how = (
+            "ruff (safe fix)"
+            if o.fixed_by == "ruff"
+            else f"Fixer: {_inline(o.rationale or o.reason)}"
+        )
         out.append(f"- {_line(o)} — {how}")
 
     out += ["", f"## Suggested, needs your OK ({len(by[FindingStatus.suggested])})", ""]
@@ -91,9 +107,9 @@ def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
         out.append("None.")
     for o in by[FindingStatus.suggested]:
         out.append(f"- {_line(o)}")
-        out.append(f"  Why not automatic: {o.reason}")
+        out.append(f"  Why not automatic: {_inline(o.reason)}")
         if o.rationale:
-            out.append(f"  Proposed fix: {o.rationale}")
+            out.append(f"  Proposed fix: {_inline(o.rationale)}")
         if o.diff:
             out += _diff_block(o.diff)
 
@@ -103,16 +119,16 @@ def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
     for o in human:
         out.append(f"- {_line(o)}")
         label = "Could not fix" if o.status == FindingStatus.failed else "Why"
-        out.append(f"  {label}: {o.reason}")
+        out.append(f"  {label}: {_inline(o.reason)}")
         if o.triage and o.triage.risk_notes:
-            out.append(f"  Proposed approach / risks: {o.triage.risk_notes}")
+            out.append(f"  Proposed approach / risks: {_inline(o.triage.risk_notes)}")
         for v in o.violations:
-            out.append(f"  Rejected fix: {v.kind} ({v.file}: {v.detail})")
+            out.append(f"  Rejected fix: {v.kind} ({v.file}: {_inline(v.detail)})")
 
     fps = by[FindingStatus.false_positive]
     if fps:
         out += ["", f"## Marked false positive ({len(fps)})", ""]
-        out += [f"- {_line(o)} — {o.reason}" for o in fps]
+        out += [f"- {_line(o)} — {_inline(o.reason)}" for o in fps]
     left = by[FindingStatus.not_triaged]
     if left:
         out += ["", f"## Not triaged ({len(left)})", ""]

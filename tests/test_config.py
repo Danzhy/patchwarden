@@ -32,7 +32,14 @@ def test_unknown_key_is_an_error():
 
 
 @pytest.mark.parametrize(
-    "raw", [{"max_fix_rounds": "2"}, {"max_fix_rounds": True}, {"auto_fix": "ruff:F401"}]
+    "raw",
+    [
+        {"max_fix_rounds": "2"},
+        {"max_fix_rounds": True},
+        {"auto_fix": "ruff:F401"},
+        {"models": {"fixer": 1}},
+        {"reasoning": {"triage": "yes"}},
+    ],
 )
 def test_wrong_type_is_an_error(raw):
     with pytest.raises(ConfigError):

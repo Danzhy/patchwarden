@@ -9,7 +9,7 @@ from patchwarden.agents.triage import finding_header, rule_description
 from patchwarden.edits import EditParseError, parse_edit_blocks
 from patchwarden.llm import LLMClient
 from patchwarden.models import EditBlock, Finding
-from patchwarden.workspace import Workspace
+from patchwarden.workspace import Workspace, split_lines
 
 WHOLE_FILE_MAX_LINES = 400
 WINDOW_LINES = 80
@@ -25,7 +25,7 @@ class FixProposal:
 
 def fixer_messages(ws: Workspace, finding: Finding) -> list[dict]:
     text = ws.read(finding.file)
-    lines = text.splitlines(keepends=True)
+    lines = split_lines(text)
     r = finding.region
     if len(lines) <= WHOLE_FILE_MAX_LINES:
         what, body = f"The whole file {finding.file}", text

@@ -12,6 +12,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 from patchwarden.models import Finding, Region
+from patchwarden.workspace import split_lines
 
 _WS = re.compile(r"\s+")
 
@@ -46,7 +47,7 @@ def relative_path(uri: str, repo_root: Path) -> str | None:
 def _read_lines(repo_root: Path, rel: str, cache: dict[str, list[str]]) -> list[str]:
     if rel not in cache:
         try:
-            cache[rel] = (repo_root / rel).read_text(errors="replace").splitlines(keepends=True)
+            cache[rel] = split_lines((repo_root / rel).read_text(errors="replace"))
         except OSError:
             cache[rel] = []
     return cache[rel]

@@ -9,6 +9,8 @@ import re
 from functools import cache
 from importlib.resources import files
 
+from patchwarden.workspace import split_lines
+
 PROMPT_VERSION = "m3.1"
 ROLES = ("triage", "fixer")
 TAG = "untrusted_repo_content"
@@ -33,13 +35,16 @@ def untrusted(text: str, source: str) -> str:
     body = _CLOSE.sub(lambda m: m.group(0).replace("</", "<\\/"), text)
     if not body.endswith("\n"):
         body += "\n"
-    return f'<{TAG} source="{source}">\n{body}</{TAG}>'
+    # The path is repo content too: a file named `x"><instructions>.py` is legal.
+    src = source.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
+    src = src.replace(">", "&gt;")
+    return f'<{TAG} source="{src}">\n{body}</{TAG}>'
 
 
 def numbered_window(text: str, start: int, end: int, radius: int = 20) -> tuple[str, int, int]:
     """Lines start-radius..end+radius (1-based), numbered, with ">" on the finding's lines.
     Returns (text, first line, last line)."""
-    lines = text.splitlines()
+    lines = [ln.rstrip("\r\n") for ln in split_lines(text)]
     lo = max(1, start - radius)
     hi = min(len(lines), end + radius)
     width = len(str(hi))

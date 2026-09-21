@@ -111,3 +111,9 @@ def test_redact(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "custom-key-123456")
     text = "k=custom-key-123456 sk-or-v1-abcdefghijkl Authorization: Bearer xyz.abc"
     assert redact(text) == "k=[REDACTED] [REDACTED] Authorization: [REDACTED]"
+
+
+def test_redact_github_tokens(monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "plain-token-value-123")
+    text = "ghp_" + "a" * 36 + " github_pat_" + "B1_" * 10 + " plain-token-value-123"
+    assert redact(text) == "[REDACTED] [REDACTED] [REDACTED]"

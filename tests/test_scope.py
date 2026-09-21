@@ -3,7 +3,7 @@ import subprocess
 import pytest
 
 from patchwarden.config import Config, from_dict
-from patchwarden.scope import files_in_scope, match_path
+from patchwarden.scope import files_in_scope, git_sha, match_path
 
 
 def write(root, rel, text="x = 1\n"):
@@ -71,3 +71,11 @@ def test_diff_scope_only_changed_python_files(tmp_path):
     files, mode, warning = files_in_scope(tmp_path, Config(), "main")
     assert files == ["old.py", "pkg/new.py"]
     assert (mode, warning) == ("diff", None)
+
+
+def test_no_git_binary_is_not_a_crash(tmp_path, monkeypatch):
+    write(tmp_path, "a.py")
+    monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+    assert git_sha(tmp_path) is None
+    files, mode, warning = files_in_scope(tmp_path, Config(), "main")
+    assert (files, mode) == (["a.py"], "full") and "cannot diff" in warning

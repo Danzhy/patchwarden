@@ -45,12 +45,15 @@ class RuffAnalyzer:
 @cache
 def rule_doc(code: str, limit: int = 1500) -> str:
     """Ruff's own explanation of a rule (`ruff rule CODE`), for the prompts. "" if unknown."""
-    proc = subprocess.run(
-        [sys.executable, "-m", "ruff", "rule", code, "--output-format", "json"],
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "ruff", "rule", code, "--output-format", "json"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        return ""  # the prompt falls back to the finding's message
     if proc.returncode != 0:
         return ""
     try:

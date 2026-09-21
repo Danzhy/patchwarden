@@ -10,10 +10,8 @@
 The search text must occur exactly once. Anything else is an error, never a guess.
 """
 
-import re
-
 from patchwarden.models import EditBlock
-from patchwarden.workspace import Workspace, WorkspaceError
+from patchwarden.workspace import Workspace, WorkspaceError, split_lines
 
 SEARCH, DIVIDER, REPLACE = "<<<<<<< SEARCH", "=======", ">>>>>>> REPLACE"
 
@@ -32,21 +30,27 @@ class EditApplyError(ValueError):
 
 
 def parse_edit_blocks(text: str) -> list[EditBlock]:
-    lines = text.splitlines()
+    # Split on "\n" only: a form feed inside SEARCH text is part of the line.
+    lines = [ln.removesuffix("\r") for ln in text.split("\n")]
+    # Trailing whitespace on a marker is tolerated; leading isn't: "    =======" is code.
+    markers = [ln.rstrip() for ln in lines]
     blocks: list[EditBlock] = []
     i = 0
     while i < len(lines):
-        if lines[i].strip() != SEARCH:
+        if markers[i].strip() != SEARCH:
             i += 1
             continue
-        # The path is the nearest non-blank line above, skipping a ```python fence.
-        above = (ln.strip() for ln in reversed(lines[:i]))
+        # The path is the nearest non-blank line above, skipping a ```python fence. Right after
+        # another block, the model often leaves it out: then it's that block's file.
+        above = (ln.strip() for ln in reversed(markers[:i]))
         path = next((ln for ln in above if ln and not ln.startswith("```")), "").strip("`")
+        if path == REPLACE and blocks:
+            path = blocks[-1].file
         if not path or path == REPLACE:
             raise EditParseError(f"edit block at line {i + 1} has no file path above it")
         try:
-            mid = lines.index(DIVIDER, i + 1)
-            end = lines.index(REPLACE, mid + 1)
+            mid = markers.index(DIVIDER, i + 1)
+            end = markers.index(REPLACE, mid + 1)
         except ValueError:
             raise EditParseError(f"unterminated edit block for {path}") from None
         blocks.append(
@@ -107,8 +111,8 @@ def apply_block(text: str, block: EditBlock) -> str:
 
 def _loose_matches(text: str, search: str) -> list[tuple[int, int]]:
     """Spans of whole-line runs equal to `search` when trailing whitespace is ignored."""
-    want = [ln.rstrip() for ln in search.splitlines()]
-    lines = re.findall(r"[^\n]*\n|[^\n]+$", text)
+    want = [ln.rstrip() for ln in split_lines(search)]
+    lines = split_lines(text)
     offsets = [0]
     for ln in lines:
         offsets.append(offsets[-1] + len(ln))

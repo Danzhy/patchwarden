@@ -240,3 +240,63 @@ def test_budget_exceeded_escalates_the_rest(tmp_path):
     assert res.outcome == "budget_exceeded"
     [run] = store.rows("runs", res.run_id)
     assert run["outcome"] == "budget_exceeded" and run["cost_usd"] == pytest.approx(0.3)
+
+
+def test_edit_above_later_findings_shifts_their_lines(tmp_path):
+    src = F841_SRC + "\n\ndef g():\n    other = 0\n    return 2\n"
+    res, t, _, _ = fix(
+        tmp_path,
+        {"app/mod.py": src},
+        {
+            ("triage", "ruff:F841"): triage_json("auto_fix"),
+            ("fixer", "ruff:F841"): [
+                # g's fix (bottom-up, so first) also adds a line above f's finding.
+                fixer_reply("app/mod.py", "def f():\n", "# helpers\ndef f():\n")
+                + fixer_reply("app/mod.py", "    other = 0\n", ""),
+                fixer_reply("app/mod.py", "    unused = 0\n", ""),
+            ],
+        },
+    )
+    assert [o.status for o in res.outcomes] == ["fixed", "fixed"]
+    f_prompts = [c.messages[1]["content"] for c in t.calls if "unused" in c.messages[1]["content"]]
+    # f's finding was on line 2; the inserted comment moved it to 3 for both roles.
+    assert all("Location: app/mod.py:3" in p for p in f_prompts[-2:])
+    triage_f = [c for c in t.calls if c.role == "triage"][1].messages[1]["content"]
+    assert "> 3 |     unused = 0" in triage_f
+
+
+def test_non_utf8_file_is_escalated_not_a_crash(tmp_path):
+    repo = make_repo(tmp_path, {})
+    (repo / "app").mkdir(parents=True)
+    (repo / "app/m.py").write_bytes(b"# caf\xe9\n" + F841_SRC.encode())
+    transport = FakeTransport({})
+    res = run_fix(
+        repo,
+        Config(),
+        store=TraceStore(tmp_path / "trace"),
+        llm_factory=lambda c, run: fake_client(transport, c, run),
+    )
+    o = only(res)
+    assert o.status == FindingStatus.escalated and "not an editable UTF-8" in o.reason
+    assert transport.calls == []
+
+
+def test_apply_refused_keeps_the_patch(tmp_path):
+    repo = make_repo(tmp_path, {"app/mod.py": F841_SRC})
+    transport = FakeTransport(
+        {
+            ("triage", "ruff:F841"): triage_json("auto_fix"),
+            ("fixer", "ruff:F841"): fixer_reply("app/mod.py", "    unused = 0\n", ""),
+        }
+    )
+
+    def factory(c, run):  # called after the workspace copy: the user edits the file meanwhile
+        (repo / "app/mod.py").write_text(F841_SRC + "# edited\n")
+        return fake_client(transport, c, run)
+
+    res = run_fix(
+        repo, Config(), store=TraceStore(tmp_path / "trace"), llm_factory=factory, apply=True
+    )
+    assert "changed since scan" in res.apply_error and res.applied == []
+    assert "-    unused = 0" in res.patch
+    assert (repo / "app/mod.py").read_text().endswith("# edited\n")

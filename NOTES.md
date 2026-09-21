@@ -225,3 +225,41 @@ Consequences for `llm.py` (M3):
   starting with two blank lines; the deterministic pass now strips new leading blank lines.
   (2) The llm_decides reason read "raised to suggest: no policy rule applies"; it now says the
   rule isn't on the auto-fix allowlist, so a human reviews the fix.
+
+## Pre-M4 review (2026-09-22)
+A full read of the code before M4. Every item below has a regression test.
+- **Crash on a non-UTF-8 file** with a finding: triage read it and raised `UnicodeDecodeError`
+  (traceback, run lost). Findings in files the workspace can't edit are now escalated.
+- **Line numbers drifted on form feeds**: `str.splitlines()` also splits on `\x0c` and friends,
+  so snippets, the Triage window's `>` marker and the Fixer's flagged lines were off by one per
+  form feed. Everything now splits on `\n` only (`workspace.split_lines`).
+- **Stale regions after a Fixer edit above later findings**: bottom-up order only protects
+  against edits below. After each finding, later findings in the same file are mapped through
+  the edit (difflib opcodes).
+- **`--apply` refused (source changed meanwhile) threw away the patch and report** and exited 2
+  with the run marked error. The patch and report are now written; exit 2 after that.
+- **Truncated replies with partial content** were used (a cut-off edit block or JSON); any
+  `finish_reason=length` is now `llm_truncated`. The budget is also checked before the JSON
+  repair turn, and HTTP 408 is retried.
+- **Report injection**: model/analyzer text went into the markdown raw (future PR comment), so a
+  newline could start a heading or list, `<!--` could fake the comment marker, and a diff with
+  backticks could close its fence. Inline text is now one line with `<` escaped and a length cap;
+  diff fences are longer than any backtick run in the diff. The prompt's `source="..."` path
+  attribute is escaped too.
+- `changed_line_count` parsed diff text, so a removed line starting with `--` (an rst underline)
+  looked like a header and wasn't counted; it now counts opcodes.
+- Edit parser: consecutive blocks may omit the repeated path; trailing spaces on markers are
+  fine; an indented `=======` is code, not a divider.
+- Smaller: no `git` binary → no crash (full scan, `git_sha` None); `ruff rule` timeout → falls
+  back to the message; `models`/`reasoning` values type-checked; output directories created;
+  trace store closed; `GITHUB_TOKEN`/`ghp_…` tokens redacted (M5).
+
+Open, by design, for later milestones:
+- **M5: the scanned repo's `[tool.patchwarden]` can weaken policy** (empty `always_escalate`,
+  `auto_fix = ["*"]`, and from M4 a `test_command`). Locally that's the user's own config; on a
+  PR it's the PR author's. CI must read policy from the base branch (or the workflow), not the
+  PR head, and never run a PR-supplied `test_command` with secrets in the environment.
+- M5: GitHub @mentions in model text would ping people from the PR comment; neutralise them in
+  `ci/comment.py`.
+- M4: after verify re-scans a fixed file, refresh later findings from the re-scan rather than
+  relying only on the opcode mapping.

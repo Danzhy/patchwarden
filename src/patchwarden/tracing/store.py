@@ -43,14 +43,20 @@ CREATE TABLE IF NOT EXISTS violations (run_id TEXT, finding_id TEXT, kind TEXT, 
 CREATE TABLE IF NOT EXISTS flags (run_id TEXT, finding_id TEXT, detector TEXT, detail TEXT);
 """
 
-_KEY_PATTERNS = [re.compile(r"sk-or-[\w-]{10,}"), re.compile(r"Bearer\s+\S+")]
+_KEY_PATTERNS = [
+    re.compile(r"sk-or-[\w-]{10,}"),
+    re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_\w{20,})"),  # GitHub tokens (CI)
+    re.compile(r"Bearer\s+\S+"),
+]
+_SECRET_ENV = ("OPENROUTER_API_KEY", "GITHUB_TOKEN", "GH_TOKEN")
 REDACTED = "[REDACTED]"
 
 
 def redact(text: str) -> str:
-    key = os.environ.get("OPENROUTER_API_KEY")
-    if key and len(key) >= 8:
-        text = text.replace(key, REDACTED)
+    for name in _SECRET_ENV:
+        key = os.environ.get(name)
+        if key and len(key) >= 8:
+            text = text.replace(key, REDACTED)
     for pat in _KEY_PATTERNS:
         text = pat.sub(REDACTED, text)
     return text

@@ -41,6 +41,18 @@ def test_parse_two_blocks_with_fence_and_prose():
     ]
 
 
+def test_parse_path_carries_over_and_markers_tolerate_trailing_space():
+    text = (
+        "a.py\n<<<<<<< SEARCH\nx\n======= \ny\n>>>>>>> REPLACE  \n"
+        "<<<<<<< SEARCH\n    =======\n\x0cz\n=======\n>>>>>>> REPLACE\n"
+    )
+    assert parse_edit_blocks(text) == [
+        EditBlock(file="a.py", search="x\n", replace="y\n"),
+        # An indented "=======" is code (an rst underline), and a form feed is not a newline.
+        EditBlock(file="a.py", search="    =======\n\x0cz\n", replace=""),
+    ]
+
+
 def test_parse_no_blocks():
     assert parse_edit_blocks("no edits needed") == []
 
