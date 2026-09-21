@@ -66,9 +66,11 @@ def _join(lines: list[str]) -> str:
     return "".join(ln + "\n" for ln in lines)
 
 
-def apply_edits(ws: Workspace, blocks: list[EditBlock]) -> list[str]:
+def apply_edits(ws: Workspace, blocks: list[EditBlock]) -> dict[str, tuple[str, str]]:
     """Apply blocks in order, each to the text left by the previous one. All or nothing: on
-    any error nothing is written. Returns the files changed."""
+    any error nothing is written. Returns {file: (before, after)} for this edit alone, which
+    is what check_diff judges and what a rejected fix is restored from."""
+    before: dict[str, str] = {}
     pending: dict[str, str] = {}
     for block in blocks:
         try:
@@ -77,11 +79,12 @@ def apply_edits(ws: Workspace, blocks: list[EditBlock]) -> list[str]:
             ok = False
         if not ok:
             raise EditApplyError("bad_path", block, "not a Python file in the repo")
-        text = pending.get(block.file, ws.read(block.file))
-        pending[block.file] = apply_block(text, block)
+        if block.file not in before:
+            before[block.file] = ws.read(block.file)
+        pending[block.file] = apply_block(pending.get(block.file, before[block.file]), block)
     for rel, text in pending.items():
         ws.write(rel, text)
-    return list(pending)
+    return {rel: (before[rel], text) for rel, text in pending.items() if text != before[rel]}
 
 
 def apply_block(text: str, block: EditBlock) -> str:

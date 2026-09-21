@@ -23,6 +23,8 @@ class DeterministicResult(BaseModel):
     resolved: list[str] = Field(default_factory=list)  # fingerprints fixed by ruff
     fixed_files: list[str] = Field(default_factory=list)
     reverted: dict[str, str] = Field(default_factory=dict)  # file -> why ruff's fix was dropped
+    # Findings still present afterwards, with regions as they are now: ruff's fixes shift lines.
+    remaining: list[Finding] = Field(default_factory=list)
 
 
 def candidates(result: ScanResult) -> dict[str, list[Finding]]:
@@ -73,6 +75,7 @@ def run_deterministic(
         ruff_fix(ws, file, sorted({f.rule_id.removeprefix("ruff:") for f in selected}))
     changed = [f for f in ws.changed_files() if f in by_file]
     if not changed:
+        out.remaining = list(result.findings)
         return out
     after, _, _ = run_analyzers(ws.root, changed, cfg, analyzers)
     after_fps: dict[str, set[str]] = defaultdict(set)
@@ -105,4 +108,9 @@ def run_deterministic(
             continue
         ws.revert(file)
         out.reverted[file] = reason
+    kept = set(out.fixed_files)
+    out.remaining = [f for f in after if f.file in kept] + [
+        f for f in result.findings if f.file not in kept
+    ]
+    out.remaining.sort(key=lambda f: (f.file, f.region.start_line, f.rule_id))
     return out

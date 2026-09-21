@@ -1,8 +1,9 @@
-"""Reporter. M1: a plain template for `scan`. The LLM-free fix report follows in M3-M4."""
+"""Reporter: plain templates, no LLM. `scan` gets a text report, `fix` a markdown report with
+Auto-fixed / Suggested / Escalated / False-positive sections (also the future PR comment)."""
 
 from collections import Counter
 
-from patchwarden.models import PreClassKind, ScanResult
+from patchwarden.models import FindingOutcome, FindingStatus, PreClassKind, ScanResult
 
 # (kind, section title, short label for the summary line)
 _GROUPS = [
@@ -42,4 +43,78 @@ def render_scan_text(result: ScanResult) -> str:
             if kind == PreClassKind.protected_path or "test file" in pc.reason:
                 line += f"  [{pc.reason}]"
             out.append(line)
+    return "\n".join(out) + "\n"
+
+
+def _line(o: FindingOutcome) -> str:
+    return f"`{o.finding.location}` **{o.finding.rule_id}**: {o.finding.message}"
+
+
+def _diff_block(diff: str) -> list[str]:
+    return ["", "  ```diff", *("  " + ln for ln in diff.rstrip("\n").splitlines()), "  ```"]
+
+
+def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
+    """`run`: run_id, outcome, cost_usd, patch (path or "")."""
+    by = {s: [o for o in outcomes if o.status == s] for s in FindingStatus}
+    human = by[FindingStatus.escalated] + by[FindingStatus.failed]
+    out = [
+        "# patchwarden report",
+        "",
+        f"Run `{run['run_id']}`: {len(outcomes)} findings; "
+        f"{len(by[FindingStatus.fixed])} auto-fixed, {len(by[FindingStatus.suggested])} "
+        f"suggested, {len(human)} escalated, {len(by[FindingStatus.false_positive])} false "
+        f"positive"
+        + (
+            f", {len(by[FindingStatus.not_triaged])} not triaged (--no-llm)"
+            if by[FindingStatus.not_triaged]
+            else ""
+        )
+        + f". LLM cost ${run['cost_usd']:.4f}. Outcome: {run['outcome']}.",
+        "",
+        "> Fixes passed patchwarden's diff policy (no suppressions, no test or other-file edits, "
+        "size and signature limits). They are not yet re-scanned or tested (coming in M4).",
+    ]
+
+    out += ["", f"## Auto-fixed ({len(by[FindingStatus.fixed])})", ""]
+    if not by[FindingStatus.fixed]:
+        out.append("None.")
+    elif run.get("patch"):
+        out.append(f"All of these are in `{run['patch']}`.")
+        out.append("")
+    for o in by[FindingStatus.fixed]:
+        how = "ruff (safe fix)" if o.fixed_by == "ruff" else f"Fixer: {o.rationale or o.reason}"
+        out.append(f"- {_line(o)} — {how}")
+
+    out += ["", f"## Suggested, needs your OK ({len(by[FindingStatus.suggested])})", ""]
+    if not by[FindingStatus.suggested]:
+        out.append("None.")
+    for o in by[FindingStatus.suggested]:
+        out.append(f"- {_line(o)}")
+        out.append(f"  Why not automatic: {o.reason}")
+        if o.rationale:
+            out.append(f"  Proposed fix: {o.rationale}")
+        if o.diff:
+            out += _diff_block(o.diff)
+
+    out += ["", f"## Escalated ({len(human)})", ""]
+    if not human:
+        out.append("None.")
+    for o in human:
+        out.append(f"- {_line(o)}")
+        label = "Could not fix" if o.status == FindingStatus.failed else "Why"
+        out.append(f"  {label}: {o.reason}")
+        if o.triage and o.triage.risk_notes:
+            out.append(f"  Proposed approach / risks: {o.triage.risk_notes}")
+        for v in o.violations:
+            out.append(f"  Rejected fix: {v.kind} ({v.file}: {v.detail})")
+
+    fps = by[FindingStatus.false_positive]
+    if fps:
+        out += ["", f"## Marked false positive ({len(fps)})", ""]
+        out += [f"- {_line(o)} — {o.reason}" for o in fps]
+    left = by[FindingStatus.not_triaged]
+    if left:
+        out += ["", f"## Not triaged ({len(left)})", ""]
+        out += [f"- {_line(o)} ({o.preclass.kind})" for o in left]
     return "\n".join(out) + "\n"

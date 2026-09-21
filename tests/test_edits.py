@@ -104,7 +104,7 @@ def test_apply_edits_sequential(tmp_path):
                 EditBlock(file="a.py", search="ONE\ntwo\n", replace="done\n"),
             ],
         )
-        assert changed == ["a.py"]
+        assert changed == {"a.py": ("one\ntwo\n", "done\n")}
         assert ws.read("a.py") == "done\n"
 
 

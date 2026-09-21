@@ -1,6 +1,6 @@
 """Pydantic models shared by every stage: findings, pre-classification, scan results, edits.
 
-VerifyResult and RunState are added in M3-M4, where they're first used.
+VerifyResult is added in M4, where it's first used.
 """
 
 from enum import StrEnum
@@ -102,3 +102,40 @@ class Violation(BaseModel):
     kind: ViolationKind
     file: str
     detail: str
+
+
+class TriageOutput(BaseModel):
+    """The Triage agent's JSON reply. Policy (clamp) has the last word on `decision`."""
+
+    decision: Decision
+    confidence: float = Field(ge=0, le=1)
+    reason: str
+    risk_notes: str = ""
+
+
+class FindingStatus(StrEnum):
+    fixed = "fixed"  # in the patch
+    suggested = "suggested"  # a proposed diff in the report, not in the patch
+    escalated = "escalated"  # a human decides; the report says why
+    false_positive = "false_positive"
+    failed = "failed"  # should have been fixed, but no edit could be applied
+    not_triaged = "not_triaged"  # --no-llm
+
+
+class FindingOutcome(BaseModel):
+    finding: Finding
+    preclass: PreClass
+    triage: TriageOutput | None = None
+    clamp: ClampResult | None = None
+    status: FindingStatus
+    fixed_by: str | None = None  # "ruff" or "fixer"
+    fix_rounds: int = 0
+    rationale: str = ""
+    diff: str = ""
+    violations: list[Violation] = Field(default_factory=list)
+    error: str | None = None
+    reason: str = ""
+
+    @property
+    def needs_human(self) -> bool:
+        return self.status in (FindingStatus.escalated, FindingStatus.failed)

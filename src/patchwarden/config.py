@@ -84,6 +84,11 @@ class Config:
             "verifier": "anthropic/claude-sonnet-5",
         }
     )
+    # OpenRouter's reasoning switch per role. Off by default: in the M0 spike, reasoning spent
+    # every output token and returned no answer.
+    reasoning: dict[str, bool] = field(
+        default_factory=lambda: {"triage": False, "fixer": False, "verifier": False}
+    )
 
     def config_hash(self) -> str:
         blob = json.dumps(dataclasses.asdict(self), sort_keys=True)
@@ -121,6 +126,7 @@ def from_dict(raw: dict) -> Config:
         )
         if not ok:
             raise ConfigError(f"[tool.patchwarden] {key}: expected {expected.__name__}")
-    if "models" in raw:
-        raw = {**raw, "models": {**defaults.models, **raw["models"]}}
+    for key in ("models", "reasoning"):  # partial tables are merged onto the defaults
+        if key in raw:
+            raw = {**raw, key: {**getattr(defaults, key), **raw[key]}}
     return dataclasses.replace(defaults, **raw)

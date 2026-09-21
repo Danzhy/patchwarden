@@ -49,6 +49,21 @@ def test_ruff_fixes_only_allowlisted_findings(scanned):
     assert {p: p.read_bytes() for p in REPO.rglob("*.py")} == before
 
 
+def test_remaining_findings_have_current_lines(scanned):
+    result, cfg = scanned
+    with open_workspace(REPO) as ws:
+        det = run_deterministic(ws, result, cfg)
+        assert len(det.remaining) == 15 - 6
+        assert not set(det.resolved) & {f.fingerprint for f in det.remaining}
+        by_rule = {(f.rule_id, f.file): f for f in det.remaining}
+        # Two import lines above it were removed: F841 moved from line 7 to line 4.
+        f841 = by_rule[("ruff:F841", "app/utils.py")]
+        assert f841.region.start_line == 4
+        assert ws.read("app/utils.py").splitlines()[3].strip() == "unused = 0"
+        # Same fingerprint as in the original scan, so pre-classification still applies.
+        assert f841.fingerprint in result.preclass
+
+
 class NewFindingAnalyzer:
     """Real ruff, plus a made-up finding in utils.py, as if the fix had introduced it."""
 

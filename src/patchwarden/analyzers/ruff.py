@@ -1,6 +1,9 @@
 """Ruff analyzer. Runs the ruff installed alongside patchwarden, with patchwarden's rule set."""
 
+import json
+import subprocess
 import sys
+from functools import cache
 from pathlib import Path
 
 from patchwarden.analyzers.base import run_sarif_tool
@@ -37,3 +40,23 @@ class RuffAnalyzer:
             *files,
         ]
         return parse_sarif(run_sarif_tool(self.name, cmd, repo), self.name, repo)
+
+
+@cache
+def rule_doc(code: str, limit: int = 1500) -> str:
+    """Ruff's own explanation of a rule (`ruff rule CODE`), for the prompts. "" if unknown."""
+    proc = subprocess.run(
+        [sys.executable, "-m", "ruff", "rule", code, "--output-format", "json"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    if proc.returncode != 0:
+        return ""
+    try:
+        data = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return ""
+    doc = f"{code} ({data.get('name', '')}): {data.get('summary', '')}\n\n"
+    doc += data.get("explanation", "")
+    return doc if len(doc) <= limit else doc[:limit].rstrip() + "\n[...]"

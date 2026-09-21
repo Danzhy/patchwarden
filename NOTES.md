@@ -161,3 +161,48 @@ Consequences for `llm.py` (M3):
 - `patchwarden fix REPO [--base] [--output patchwarden.patch] [--apply]` runs the deterministic
   pass only for now; M3 adds the LLM stages and `--no-llm` to keep this behaviour.
 - 133 tests, 96% coverage overall, 98% on `policy.py`.
+
+## M3: LLM client, Triage + Fixer graph, trace store (2026-09-22)
+- `fix` is now the full pipeline: scan → ruff's safe fixes → per finding: Triage → `clamp` →
+  Fixer → apply edits → `check_diff` → markdown report. Output: `patchwarden.patch`,
+  `patchwarden-report.md`, and a trace in `.patchwarden/` (SQLite + one JSONL file per run), all
+  in the cwd by default. Exit 1 if anything is escalated or couldn't be fixed. `--no-llm` keeps
+  the M2 behaviour; `--budget-usd` overrides `budget_usd`.
+- **One LangGraph graph per finding** (`triage → clamp → fixer → apply ⟲ one retry →
+  finalize`), invoked in a plain loop. State is small and serialisable; the workspace, LLM,
+  trace run and config are closure dependencies. This keeps each finding's trace self-contained
+  and stays clear of LangGraph's 25-step recursion limit on big runs.
+- **Bottom-up order** within a file: an edit only shifts lines below it, which are done already.
+  After ruff's pass the findings are re-read from its re-scan (`DeterministicResult.remaining`),
+  since removed imports shift everything up; fingerprints don't change, so pre-class still applies.
+- **Triage sees every remaining finding**, including always-escalate ones: clamp overrides it,
+  but its reason/risk notes become the report's "proposed approach", and it's what
+  `triage_policy_disagreement` and eval C measure. On the fixture it's 9 cheap calls.
+- `suggest` findings also get a Fixer diff, shown in the report and restored in the workspace, so
+  only `auto_fix` changes are in the patch. `apply_edits` now returns `{file: (before, after)}`
+  for exactly one fix; that is what `check_diff` judges and what a rejected fix is restored from.
+- Failure handling, all ending in escalated/failed, never in an unchecked change:
+  edit doesn't apply or no blocks → one retry with the error fed back, then `failed`;
+  `check_diff` violation → restored, `violations` row, escalated; invalid JSON → one repair turn,
+  then `invalid_json_from_llm`; `finish_reason=length` with no content → `llm_truncated`;
+  429/5xx/connection → 3 attempts with backoff; budget checked before every call (a run can
+  overshoot by one call), then all remaining findings escalate and the run outcome is
+  `budget_exceeded`.
+- `llm.py`: a `Transport` protocol (OpenRouter via the `openai` client with `max_retries=0`, so
+  every retry is ours and traced) under `LLMClient`. Tests replace only the transport
+  (`tests/fake_llm.py`), so retry/repair/budget code is what's tested. The OpenRouter transport is
+  tested against `httpx.MockTransport` (request body: `reasoning.enabled`, `usage.include`,
+  `response_format`). New config key `reasoning` per role, default off.
+- Prompts: `agents/prompts/{triage,fixer}.md`; `prompt_version` = `PROMPT_VERSION` + hash of the
+  prompt files. Repo text goes inside `<untrusted_repo_content>`; a closing tag inside the text is
+  escaped so a file can't end the block early. The Fixer gets the whole file without line numbers
+  (so SEARCH copies cleanly; a ±80-line window above 400 lines); Triage gets ±20 numbered lines.
+  Rule docs come from `ruff rule CODE`.
+- Trace store: tables `runs, steps, findings, violations, flags` (flags filled in M4). Steps nest
+  `finding → triage → llm:triage` etc. via `parent_step_id`. Every text column goes through
+  `redact` (the key's value, `sk-or-…`, `Bearer …`).
+- **Pitfall found while testing:** the first CLI test run went through the real `make_client`,
+  which loaded the project's `.env` and tried OpenRouter (it failed at the sandbox's TLS proxy, so
+  nothing was sent or spent). Now `tests/conftest.py` removes the key, disables `load_dotenv`
+  and runs every test in a temp cwd, so a test can't reach the network or write into the project.
+- 184 tests, 97% coverage (llm 98%, graph 99%, store 98%, pipeline 100%).

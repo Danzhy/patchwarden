@@ -72,3 +72,9 @@ def files_in_scope(repo: Path, cfg: Config, base: str | None) -> tuple[list[str]
         warning = f"cannot diff against {base!r} (not a git repo or unknown ref); scanning all"
         return all_python_files(repo, cfg), "full", warning
     return all_python_files(repo, cfg), "full", None
+
+
+def git_sha(repo: Path) -> str | None:
+    """HEAD's commit, or None outside a git repo (recorded with each run)."""
+    proc = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True)
+    return proc.stdout.strip() if proc.returncode == 0 else None

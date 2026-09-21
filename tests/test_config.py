@@ -21,6 +21,11 @@ def test_override_from_pyproject(tmp_path):
     assert cfg.models["triage"] == Config().models["triage"]
 
 
+def test_reasoning_table_is_merged():
+    cfg = from_dict({"reasoning": {"fixer": True}})
+    assert cfg.reasoning == {"triage": False, "fixer": True, "verifier": False}
+
+
 def test_unknown_key_is_an_error():
     with pytest.raises(ConfigError, match="protected_path"):
         from_dict({"protected_path": ["x/**"]})
