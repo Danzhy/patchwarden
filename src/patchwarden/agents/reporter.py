@@ -4,7 +4,13 @@ Auto-fixed / Suggested / Escalated / False-positive sections (also the future PR
 import re
 from collections import Counter
 
-from patchwarden.models import FindingOutcome, FindingStatus, PreClassKind, ScanResult
+from patchwarden.models import (
+    FindingOutcome,
+    FindingStatus,
+    PreClassKind,
+    ScanResult,
+    TestStatus,
+)
 
 # (kind, section title, short label for the summary line)
 _GROUPS = [
@@ -66,8 +72,39 @@ def _diff_block(diff: str) -> list[str]:
     return ["", f"  {fence}diff", *body, f"  {fence}"]
 
 
+def _checks(o: FindingOutcome) -> str:
+    """What the last fix passed, for a suggestion."""
+    parts = []
+    if o.verify:
+        parts.append("re-scan clean")
+        parts.append("tests passed" if o.verify.tests == TestStatus.passed else "tests not run")
+    if o.verifier:
+        parts.append(
+            f"Verifier {o.verifier.verdict} ({o.verifier.behaviour_change_risk} risk): "
+            f"{_inline(o.verifier.reason)}"
+        )
+    return "; ".join(parts)
+
+
+def _how_checked(run: dict) -> str:
+    policy = (
+        "the diff policy (no suppressions, no test or other-file edits, size and signature limits)"
+    )
+    if run.get("tests_skipped"):
+        return (
+            f"> Tests: {_inline(run['tests_skipped'])}. So the Fixer's changes are only "
+            f"suggested, never applied. They passed {policy}, a re-scan (the finding is gone, "
+            "nothing new) and an independent Verifier review."
+        )
+    return (
+        f"> Every auto-fix passed {policy}, a re-scan (the finding is gone, nothing new), the "
+        f"tests (`{_inline(run.get('test_command') or '')}`) and, for the Fixer's, an "
+        "independent Verifier review."
+    )
+
+
 def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
-    """`run`: run_id, outcome, cost_usd, patch (path or "")."""
+    """`run`: run_id, outcome, cost_usd, patch (path or ""), test_command, tests_skipped."""
     by = {s: [o for o in outcomes if o.status == s] for s in FindingStatus}
     human = by[FindingStatus.escalated] + by[FindingStatus.failed]
     out = [
@@ -84,8 +121,7 @@ def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
         )
         + f". LLM cost ${run['cost_usd']:.4f}. Outcome: {run['outcome']}.",
         "",
-        "> Fixes passed patchwarden's diff policy (no suppressions, no test or other-file edits, "
-        "size and signature limits). They are not yet re-scanned or tested (coming in M4).",
+        _how_checked(run),
     ]
 
     out += ["", f"## Auto-fixed ({len(by[FindingStatus.fixed])})", ""]
@@ -99,6 +135,7 @@ def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
             "ruff (safe fix)"
             if o.fixed_by == "ruff"
             else f"Fixer: {_inline(o.rationale or o.reason)}"
+            + (f" (Verifier: {o.verifier.behaviour_change_risk} risk)" if o.verifier else "")
         )
         out.append(f"- {_line(o)} — {how}")
 
@@ -110,6 +147,8 @@ def render_fix_markdown(outcomes: list[FindingOutcome], run: dict) -> str:
         out.append(f"  Why not automatic: {_inline(o.reason)}")
         if o.rationale:
             out.append(f"  Proposed fix: {_inline(o.rationale)}")
+        if o.verify or o.verifier:
+            out.append(f"  Checks: {_checks(o)}")
         if o.diff:
             out += _diff_block(o.diff)
 

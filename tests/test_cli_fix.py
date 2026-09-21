@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-from fake_llm import FakeTransport, fake_client, fixer_reply, triage_json
+from fake_llm import FakeTransport, fake_client, fixer_reply, triage_json, verifier_json
 from typer.testing import CliRunner
 
 from patchwarden.cli import app
@@ -46,6 +46,7 @@ SCRIPT = {
         ),
     ],
     ("fixer", "ruff:F841"): fixer_reply("app/utils.py", "    unused = 0\n", "", "drop it"),
+    ("verifier", "*"): verifier_json(),
 }
 
 
@@ -111,18 +112,31 @@ def test_full_fix_with_fake_llm(tmp_path, fake):
     report = (tmp_path / "report.md").read_text()
     suggested = report.split("## Suggested")[1].split("## Escalated")[0]
     assert suggested.count("**ruff:") == 3 and "+def append_item(item, bucket=None):" in suggested
+    # SIM103 in utils.py was refreshed from the re-scan after the E711 fix above it.
+    assert "Return the condition `value is None` directly" in suggested
+    assert suggested.count("Checks: re-scan clean; tests passed; Verifier pass (low risk)") == 3
+    assert "the tests (`python -m pytest -q`)" in report
     escalated = report.split("## Escalated (4)")[1]
     assert "bandit:B602" in escalated and "ruff:F401" in escalated
     assert "protected path" in escalated
     assert "Proposed approach / risks: use hashlib.sha256" in escalated
 
-    # Triage for all 9 findings left after ruff; the Fixer for the 5 auto_fix/suggest ones.
-    assert sum(1 for role, _ in fake.roles() if role == "triage") == 9
-    assert sum(1 for role, _ in fake.roles() if role == "fixer") == 5
+    # Triage for all 9 findings left after ruff; the Fixer and the Verifier for the 5
+    # auto_fix/suggest ones (every fix passed its checks on the first round).
+    roles = [role for role, _ in fake.roles()]
+    assert (roles.count("triage"), roles.count("fixer"), roles.count("verifier")) == (9, 5, 5)
 
     [run] = db_rows(tmp_path, "SELECT * FROM runs")
     assert run["outcome"] == "escalations" and run["trigger"] == "cli"
-    assert run["cost_usd"] == pytest.approx(0.014) and run["prompt_version"].startswith("m3.")
+    assert run["cost_usd"] == pytest.approx(0.019) and run["prompt_version"].startswith("m4.")
+    tests = db_rows(tmp_path, "SELECT input_json, output_json FROM steps WHERE node = 'tests'")
+    assert [json.loads(t["input_json"])["stage"] for t in tests] == ["baseline", "deterministic"]
+    assert all(json.loads(t["output_json"])["status"] == "passed" for t in tests)
+    verify = db_rows(tmp_path, "SELECT output_json FROM steps WHERE node = 'verify'")
+    assert [json.loads(v["output_json"])["tests"] for v in verify] == ["passed"] * 5
+    # Only the protected-path F401: Triage said auto_fix, policy escalated it.
+    flags = db_rows(tmp_path, "SELECT detector FROM flags")
+    assert [f["detector"] for f in flags] == ["triage_policy_disagreement"]
     findings = db_rows(tmp_path, "SELECT * FROM findings")
     assert len(findings) == 15
     status = {}

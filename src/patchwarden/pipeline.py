@@ -1,11 +1,12 @@
-"""`fix` end to end: scan -> workspace -> ruff's safe fixes -> per-finding graph (Triage, clamp,
-Fixer, apply, check_diff) -> report. Every stage is a trace step; every finding gets a row.
+"""`fix` end to end: scan -> workspace -> baseline tests -> ruff's safe fixes (+ tests) ->
+per-finding graph (Triage, clamp, Fixer, apply, check_diff, verify, Verifier) -> report ->
+failure detectors. Every stage is a trace step; every finding gets a row.
 
-Findings are processed bottom-up within each file, so an applied edit only shifts lines of
-findings that are already done.
+Findings are processed bottom-up within each file, so an applied edit mostly shifts lines of
+findings that are already done; later findings are mapped through each kept edit and refreshed
+from verify's re-scan.
 """
 
-import difflib
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -15,13 +16,22 @@ from patchwarden.agents.prompts import prompt_version
 from patchwarden.agents.reporter import render_fix_markdown
 from patchwarden.analyzers import Analyzer
 from patchwarden.config import Config
-from patchwarden.deterministic import run_deterministic
+from patchwarden.deterministic import run_deterministic, undo_deterministic
 from patchwarden.llm import BudgetExceeded, LLMClient
-from patchwarden.models import Finding, FindingOutcome, FindingStatus, PreClassKind, Region
+from patchwarden.models import (
+    Finding,
+    FindingOutcome,
+    FindingStatus,
+    PreClassKind,
+    Region,
+    TestStatus,
+)
 from patchwarden.scan import scan
 from patchwarden.scope import git_sha
+from patchwarden.tracing.detectors import Flag, detect_and_store
 from patchwarden.tracing.store import Run, TraceStore
-from patchwarden.workspace import WorkspaceError, open_workspace, split_lines
+from patchwarden.verify import TestRunner, locate
+from patchwarden.workspace import WorkspaceError, line_mapper, open_workspace
 
 LLMFactory = Callable[[Config, Run], LLMClient]
 ESCALATE_KINDS = (PreClassKind.always_escalate, PreClassKind.protected_path)
@@ -39,6 +49,9 @@ class FixResult:
     warnings: list[str] = field(default_factory=list)
     applied: list[str] = field(default_factory=list)
     apply_error: str | None = None  # --apply refused: the source changed since the scan
+    test_command: str | None = None
+    tests_skipped: str | None = None  # why the Fixer's changes weren't tested
+    flags: list[Flag] = field(default_factory=list)
 
     def report(self, patch_path: str = "") -> str:
         info = {
@@ -46,6 +59,8 @@ class FixResult:
             "outcome": self.outcome,
             "cost_usd": self.cost_usd,
             "patch": patch_path if self.patch else "",
+            "test_command": self.test_command,
+            "tests_skipped": self.tests_skipped,
         }
         return render_fix_markdown(self.outcomes, info)
 
@@ -80,9 +95,11 @@ def run_fix(
         res = _run(run, repo, cfg, llm_factory, base, no_llm, apply, analyzers)
     except BaseException:
         run.finish("error")
+        detect_and_store(run)
         raise
     totals = run.finish(res.outcome)
     res.cost_usd = totals["cost_usd"]
+    res.flags = detect_and_store(run)
     return res
 
 
@@ -100,9 +117,18 @@ def _run(run, repo, cfg, llm_factory, base, no_llm, apply, analyzers) -> FixResu
     budget_hit = False
 
     with open_workspace(repo) as ws:
+        tests = TestRunner(cfg, ws.root)
+        if result.findings:
+            _run_tests(run, tests, "baseline")
+            if tests.skip_reason and cfg.test_command:
+                warnings.append(f"{tests.skip_reason}; Fixer changes will only be suggested")
         with run.step("deterministic") as step:
             det = run_deterministic(ws, result, cfg, analyzers)
             step.output = det.model_dump(mode="json", exclude={"remaining"})
+        if det.fixed_files:
+            status = _run_tests(run, tests, "deterministic")
+            if status not in (TestStatus.passed, TestStatus.skipped):
+                det = undo_deterministic(ws, result, det, f"the tests {status} after ruff's fixes")
         for fp in det.resolved:
             o = FindingOutcome(
                 finding=by_fp[fp],
@@ -129,6 +155,9 @@ def _run(run, repo, cfg, llm_factory, base, no_llm, apply, analyzers) -> FixResu
                 cfg=cfg,
                 findings={f.fingerprint: f for f in remaining},
                 preclass=result.preclass,
+                tests=tests,
+                current=_by_file(det.remaining),
+                analyzers=analyzers,
             )
             graph = build_finding_graph(deps)
             for i, pending in enumerate(remaining):
@@ -152,10 +181,19 @@ def _run(run, repo, cfg, llm_factory, base, no_llm, apply, analyzers) -> FixResu
                         except BudgetExceeded as e:
                             budget_hit = True
                             step.error = str(e)
+                            ws.write(f.file, before)  # an edit may be applied but unverified
                             o = _escalate(f, result, str(e))
                             run.finding(o)
                         step.output = {"status": o.status}
-                    _shift_later(deps.findings, remaining[i + 1 :], f.file, before, ws)
+                    _shift_later(
+                        deps.findings,
+                        remaining[i + 1 :],
+                        f.file,
+                        before,
+                        ws,
+                        deps.current.get(f.file, []),
+                        cfg.max_lines_changed,
+                    )
                 outcomes.append(o)
 
         patch = ws.diff()
@@ -190,25 +228,42 @@ def _run(run, repo, cfg, llm_factory, base, no_llm, apply, analyzers) -> FixResu
         warnings=warnings,
         applied=applied,
         apply_error=apply_error,
+        test_command=cfg.test_command,
+        tests_skipped=tests.skip_reason,
     )
 
 
-def _shift_later(findings: dict[str, Finding], later: list[Finding], file: str, before, ws):
+def _run_tests(run: Run, tests: TestRunner, stage: str) -> TestStatus:
+    with run.step("tests", input={"stage": stage, "command": tests.cmd}) as step:
+        status, detail = tests.baseline() if stage == "baseline" else tests.run()
+        step.output = {"status": status, "detail": detail[-500:]}
+    return status
+
+
+def _by_file(findings: list[Finding]) -> dict[str, list[Finding]]:
+    out: dict[str, list[Finding]] = {}
+    for f in findings:
+        out.setdefault(f.file, []).append(f)
+    return out
+
+
+def _shift_later(
+    findings: dict[str, Finding],
+    later: list[Finding],
+    file: str,
+    before: str,
+    ws,
+    current: list[Finding],
+    radius: int,
+):
     """Bottom-up order keeps later findings' lines valid unless an edit also touched lines
-    above them (a new import at the top, say). Map their regions through the edit."""
+    above them (a new import at the top, say). Map their regions through the edit, then take
+    the exact region from the re-scan (`current`) where the finding can be found there. The
+    fingerprint stays the one from the scan: it's the finding's id in the trace."""
     after = ws.read(file)
     if after == before:
         return
-    ops = difflib.SequenceMatcher(
-        None, split_lines(before), split_lines(after), autojunk=False
-    ).get_opcodes()
-
-    def new_line(n: int) -> int:
-        for tag, i1, i2, j1, _ in ops:
-            if i1 <= n - 1 < i2:
-                return j1 + (n - 1 - i1) + 1 if tag == "equal" else j1 + 1
-        return n
-
+    new_line = line_mapper(before, after)
     for g in later:
         if g.file == file:
             cur = findings[g.fingerprint]
@@ -216,7 +271,14 @@ def _shift_later(findings: dict[str, Finding], later: list[Finding], file: str, 
             region = Region(
                 **{**cur.region.model_dump(), "start_line": start, "end_line": max(start, end)}
             )
-            findings[g.fingerprint] = cur.model_copy(update={"region": region})
+            moved = cur.model_copy(update={"region": region})
+            i = locate(moved, current, radius)
+            if i is not None:
+                now = current[i]
+                moved = moved.model_copy(
+                    update={"region": now.region, "snippet": now.snippet, "message": now.message}
+                )
+            findings[g.fingerprint] = moved
 
 
 def _escalate(f: Finding, result, reason: str) -> FindingOutcome:

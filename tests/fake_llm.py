@@ -67,6 +67,10 @@ def triage_json(decision: str, reason: str = "scripted", risk_notes: str = "", c
     )
 
 
+def verifier_json(verdict: str = "pass", risk: str = "low", reason: str = "scripted") -> str:
+    return json.dumps({"verdict": verdict, "reason": reason, "behaviour_change_risk": risk})
+
+
 def fixer_reply(file: str, search: str, replace: str, rationale: str = "scripted fix") -> str:
     return (
         f"RATIONALE: {rationale}\n{file}\n<<<<<<< SEARCH\n{search}=======\n{replace}"

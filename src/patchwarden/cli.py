@@ -7,6 +7,10 @@ from typing import Annotated
 import typer
 
 app = typer.Typer(help="Fix static-analysis warnings safely.", no_args_is_help=True)
+trace_app = typer.Typer(help="Inspect runs in the trace store.", no_args_is_help=True)
+app.add_typer(trace_app, name="trace")
+
+TraceDir = Annotated[Path, typer.Option(help="Trace store directory (traces.db + runs/*.jsonl).")]
 
 
 class OutputFormat(StrEnum):
@@ -75,9 +79,7 @@ def fix(
     report: Annotated[Path, typer.Option(help="Where to write the markdown report.")] = Path(
         "patchwarden-report.md"
     ),
-    trace_dir: Annotated[
-        Path, typer.Option(help="Trace store directory (traces.db + runs/*.jsonl).")
-    ] = Path(".patchwarden"),
+    trace_dir: TraceDir = Path(".patchwarden"),
     apply: Annotated[
         bool, typer.Option("--apply", help="Also write the auto-fixes to the repo.")
     ] = False,
@@ -91,6 +93,7 @@ def fix(
     """Fix findings in a temporary copy; write a patch and a report. The repo changes only
     with --apply. Exit code 1 if anything needs a human (escalated or not fixable)."""
     import dataclasses
+    from collections import Counter
 
     from patchwarden.analyzers import AnalyzerError
     from patchwarden.config import ConfigError, load_config
@@ -137,6 +140,13 @@ def fix(
     typer.echo(f"patch: {output}" + ("" if res.patch else " (empty)"))
     typer.echo(f"report: {report}")
     typer.echo(f"trace: {res.run_id} in {trace_dir} (cost ${res.cost_usd:.4f}, {res.outcome})")
+    if res.flags:
+        counts = Counter(f.detector for f in res.flags)
+        typer.echo(
+            "flags: "
+            + ", ".join(f"{d} x{n}" for d, n in counts.most_common())
+            + f" (patchwarden trace show {res.run_id})"
+        )
     if res.applied:
         typer.echo(f"applied to {len(res.applied)} files: {', '.join(res.applied)}")
     if res.apply_error:
@@ -151,3 +161,67 @@ def make_llm(cfg, run):
     from patchwarden.llm import make_client
 
     return make_client(cfg, run)
+
+
+def _open_store(trace_dir: Path):
+    from patchwarden.tracing.store import TraceStore
+
+    if not (trace_dir / "traces.db").is_file():
+        typer.echo(f"error: no trace store at {trace_dir} (run `patchwarden fix` first)", err=True)
+        raise typer.Exit(2)
+    return TraceStore(trace_dir)
+
+
+@trace_app.command("list")
+def trace_list(
+    trace_dir: TraceDir = Path(".patchwarden"),
+    limit: Annotated[int, typer.Option(help="How many runs, newest first.")] = 20,
+) -> None:
+    """Recent runs: outcome, findings, flags and cost."""
+    from patchwarden.tracing.render import render_list
+
+    store = _open_store(trace_dir)
+    try:
+        typer.echo(render_list(store, limit), nl=False)
+    finally:
+        store.close()
+
+
+@trace_app.command("show")
+def trace_show(
+    run_id: Annotated[str, typer.Argument(help='A run id, a unique prefix, or "last".')] = "last",
+    trace_dir: TraceDir = Path(".patchwarden"),
+) -> None:
+    """One run as a timeline tree of its steps, then its failure flags."""
+    from patchwarden.tracing.render import render_show, resolve_run
+
+    store = _open_store(trace_dir)
+    try:
+        rid = resolve_run(store, run_id)
+        if rid is None:
+            typer.echo(f"error: no run matches {run_id!r} (see `patchwarden trace list`)", err=True)
+            raise typer.Exit(2)
+        typer.echo(render_show(store, rid), nl=False)
+    finally:
+        store.close()
+
+
+@trace_app.command("stats")
+def trace_stats(
+    trace_dir: TraceDir = Path(".patchwarden"),
+    run: Annotated[str | None, typer.Option(help="Only this run (id, prefix or last).")] = None,
+) -> None:
+    """Flag counts, and per rule: outcomes, fix rate and LLM cost."""
+    from patchwarden.tracing.render import render_stats, resolve_run
+
+    store = _open_store(trace_dir)
+    try:
+        rid = None
+        if run is not None:
+            rid = resolve_run(store, run)
+            if rid is None:
+                typer.echo(f"error: no run matches {run!r}", err=True)
+                raise typer.Exit(2)
+        typer.echo(render_stats(store, rid), nl=False)
+    finally:
+        store.close()

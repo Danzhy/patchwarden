@@ -61,16 +61,16 @@ def propose_fix(
     parent: int | None,
 ) -> str:
     """The Fixer's raw reply (parse it with parse_proposal). `feedback`: (previous reply, what
-    went wrong with it), oldest first."""
+    was wrong with it: an edit error, a failed check or the Verifier's reason), oldest first."""
     messages = fixer_messages(ws, finding)
     for reply, error in feedback:
         messages += [
             {"role": "assistant", "content": reply},
             {
                 "role": "user",
-                "content": f"That edit could not be used: {error}\n"
-                "The file is unchanged. Reply again in the required format, with SEARCH text "
-                "copied exactly from the current file.",
+                "content": f"That fix was not accepted: {error}\n"
+                "The file is back to how it was before your edit. Reply again in the required "
+                "format, with SEARCH text copied exactly from the current file.",
             },
         ]
     return llm.complete("fixer", messages, finding_id=finding.fingerprint, parent=parent).text

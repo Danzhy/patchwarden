@@ -123,3 +123,15 @@ def run_deterministic(
     ]
     out.remaining.sort(key=lambda f: (f.file, f.region.start_line, f.rule_id))
     return out
+
+
+def undo_deterministic(
+    ws: Workspace, result: ScanResult, det: DeterministicResult, reason: str
+) -> DeterministicResult:
+    """Revert every file ruff fixed (the tests failed afterwards); its findings go to the LLM."""
+    for file in det.fixed_files:
+        ws.revert(file)
+    return DeterministicResult(
+        reverted={**det.reverted, **dict.fromkeys(det.fixed_files, reason)},
+        remaining=sorted(result.findings, key=lambda f: (f.file, f.region.start_line, f.rule_id)),
+    )

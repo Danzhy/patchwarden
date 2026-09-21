@@ -121,3 +121,25 @@ def test_rule_doc_timeout_falls_back(monkeypatch):
 
     monkeypatch.setattr(subprocess, "run", slow)
     assert rule_doc.__wrapped__("F841") == ""
+
+
+def test_verifier_prompt_has_the_diff_and_checks_but_no_rationale():
+    from patchwarden.agents.verifier import verifier_messages
+    from patchwarden.models import VerifyResult
+
+    f = Finding(
+        tool="ruff",
+        rule_id="ruff:F841",
+        message="Local variable `x` is assigned to but never used",
+        file="m.py",
+        region=Region(start_line=2, end_line=2),
+        snippet="    x = 0\n",
+        fingerprint="fp",
+    )
+    diff = "--- a/m.py\n+++ b/m.py\n@@ -1,3 +1,2 @@\n def f():\n-    x = 0\n     return 1\n"
+    res = VerifyResult(syntax_ok=True, target_gone=True, tests="passed")
+    system, user = verifier_messages(f, diff, res, "pytest -q")
+    assert system["content"] == prompts.load("verifier")
+    assert user["content"].startswith("Rule: ruff:F841\n")
+    assert "- The repository's tests pass (`pytest -q`)." in user["content"]
+    assert '<untrusted_repo_content source="m.py">\n--- a/m.py' in user["content"]

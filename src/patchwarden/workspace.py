@@ -10,7 +10,7 @@ import difflib
 import re
 import shutil
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path, PurePosixPath
 
@@ -110,12 +110,29 @@ def split_lines(text: str) -> list[str]:
     return re.findall(r"[^\n]*\n|[^\n]+$", text)
 
 
-def unified_diff(rel: str, before: str, after: str) -> str:
+def line_mapper(before: str, after: str) -> Callable[[int], int]:
+    """Where 1-based line n of `before` is in `after`. A line inside a changed hunk maps to the
+    hunk's first new line."""
+    ops = difflib.SequenceMatcher(
+        None, split_lines(before), split_lines(after), autojunk=False
+    ).get_opcodes()
+
+    def new_line(n: int) -> int:
+        for tag, i1, i2, j1, _ in ops:
+            if i1 <= n - 1 < i2:
+                return j1 + (n - 1 - i1) + 1 if tag == "equal" else j1 + 1
+        return n
+
+    return new_line
+
+
+def unified_diff(rel: str, before: str, after: str, context: int = 3) -> str:
     lines = difflib.unified_diff(
         split_lines(before),
         split_lines(after),
         fromfile=f"a/{rel}",
         tofile=f"b/{rel}",
+        n=context,
     )
     out = []
     for line in lines:

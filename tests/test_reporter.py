@@ -9,6 +9,8 @@ from patchwarden.models import (
     PreClassKind,
     Region,
     TriageOutput,
+    VerifierOutput,
+    VerifyResult,
 )
 
 RUN = {"run_id": "r1", "outcome": "escalations", "cost_usd": 0.0, "patch": ""}
@@ -47,3 +49,21 @@ def test_diff_with_backticks_cannot_close_the_fence():
     diff = '--- a/app/m.py\n+++ b/app/m.py\n@@ -1 +1 @@\n-x = "```"\n+x = "````"\n'
     md = render_fix_markdown([outcome(FindingStatus.suggested, diff=diff, reason="r")], RUN)
     assert "  `````diff\n" in md and md.count("\n  `````\n") == 1
+
+
+def test_header_says_how_fixes_were_checked():
+    tested = render_fix_markdown([], {**RUN, "test_command": "pytest -q"})
+    assert "the tests (`pytest -q`)" in tested and "Verifier" in tested
+    skipped = render_fix_markdown([], {**RUN, "tests_skipped": "no test_command configured"})
+    assert "> Tests: no test_command configured. So the Fixer's changes are only suggested" in (
+        skipped
+    )
+
+
+def test_suggestion_shows_its_checks():
+    ver = VerifyResult(syntax_ok=True, target_gone=True, tests="skipped", tests_detail="none")
+    rev = VerifierOutput(verdict="pass", reason="same\nbehaviour", behaviour_change_risk="med")
+    md = render_fix_markdown(
+        [outcome(FindingStatus.suggested, reason="r", verify=ver, verifier=rev)], RUN
+    )
+    assert "  Checks: re-scan clean; tests not run; Verifier pass (med risk): same behaviour" in md

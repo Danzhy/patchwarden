@@ -263,3 +263,94 @@ Open, by design, for later milestones:
   `ci/comment.py`.
 - M4: after verify re-scans a fixed file, refresh later findings from the re-scan rather than
   relying only on the opcode mapping.
+
+## M4: verify, Verifier, fix-round loop, detectors, trace CLI (2026-09-22)
+The graph per finding is now `triage → clamp → fixer → apply (+check_diff) → verify → verifier →
+finalize`. If an edit doesn't apply, a check fails or the Verifier rejects the fix, the file is
+restored and the Fixer is called again with the reason, up to `max_fix_rounds` Fixer calls
+(default 2; retries count). A policy violation still escalates at once, with no retry.
+- **verify.py** runs the code checks: `ast.parse`, a re-scan of the edited file with every
+  configured analyzer, then `test_command`. The tests run last, only when everything else
+  passed, because they're the slow part.
+  - Findings are matched before/after by fingerprint *and* mapped line, then by rule + nearest
+    line within `max_lines_changed`. Two cases forced this:
+    - Fixing E711 on `if v == None:` changes the SIM103 finding's snippet, and so its
+      fingerprint. Matching on the fingerprint alone called that a "new finding".
+    - With two identical snippets, the second fingerprint has a `:1` suffix. Fixing the first
+      moves the bare fingerprint onto the second one, which looked like "target not gone".
+    Both are regression tests in `test_verify.py`.
+  - A fix fails if it also makes *another* finding disappear (`also_resolved`), because a fix
+    touches one finding's code. This is stricter than necessary, but it keeps a Fixer from
+    quietly rewriting a nearby security finding.
+- **Tests:**
+  - A baseline test run happens before any change. If the tests already fail, they can't tell a
+    good fix from a bad one: that's a warning, and every Fixer change becomes a suggestion.
+  - The tests also run after ruff's deterministic fixes. If they fail, all of ruff's fixes are
+    reverted and those findings go to the LLM.
+  - No `test_command` means Fixer changes are suggestions only (the spec's risk table: untested
+    code is never auto-fixed). Ruff's own safe fixes are still applied.
+  - Test commands run with `shlex.split` (no shell), stdin closed, and every env var whose name
+    matches `API_KEY|TOKEN|SECRET|PASSWORD|OPENROUTER` removed. The tests run repo code after
+    an LLM edited it.
+- **Verifier** (`agents/verifier.py`, `prompts/verifier.md`, JSON
+  `{verdict, reason, behaviour_change_risk}`):
+  - It gets the finding, the rule doc, a diff with 10 lines of context and a summary of the
+    checks. It never sees the Fixer's rationale.
+  - It only runs after the code checks pass, so no money is spent reviewing a fix the re-scan
+    already rejected.
+  - A pass rated high risk becomes a suggestion. An LLM error from the Verifier escalates the
+    finding and restores the file.
+- **What stays in the patch:** only an `auto_fix` whose tests ran and passed and that the
+  Verifier passed with low or med risk. Suggestions go through the same loop, so the diff in
+  the report has been checked too.
+- **Syntax errors** are no longer a check_diff violation in the graph (a broken fix isn't a
+  cheating attempt). verify reports them, and the Fixer gets another round.
+- **Later findings** in the same file are refreshed from verify's re-scan after a kept fix:
+  their region, snippet and message. The line mapping is the fallback. The fingerprint stays
+  the scan's, as the trace id. This closes the open item from the pre-M4 review.
+- **Budget exceeded at the Verifier:** the pipeline restores the file, since the edit is
+  applied but unverified. Test: `test_budget_hit_at_the_verifier_restores_the_file`.
+- **Detectors** (`tracing/detectors.py`): the spec's 9 detectors, as pure functions over a
+  run's rows. They run at the end of every run, including failed ones, and write `flags`.
+  | detector | source |
+  |---|---|
+  | new_finding_introduced | `verify` steps with `new_findings` |
+  | tests_broke | `verify` steps with tests failed/timeout/error; the post-ruff `tests` step |
+  | cheating_attempt | `violations` rows |
+  | round_limit_hit | `finalize` step output (`round_limit_hit`) |
+  | edit_apply_failed | `apply_edits` step errors |
+  | triage_policy_disagreement | `findings.clamped = 1` |
+  | cost_over_budget | run outcome `budget_exceeded` or a budget step error (one flag) |
+  | invalid_json_from_llm | `llm:*` step errors |
+  | step_error | any other step error, reported at the deepest step only |
+- **CLI:**
+  - `trace list`.
+  - `trace show [RUN|prefix|last]`: a timeline tree from `parent_step_id`, with a one-line
+    summary per step, errors under their step, then the flags.
+  - `trace stats [--run]`: flag counts, and per rule the outcomes, fix rate and LLM cost.
+  - `fix` prints a `flags:` line.
+- Prompt version `m4.1` (the Verifier prompt was added to the hash).
+- **Pitfalls found:**
+  - In the sandbox, `python` on PATH isn't runnable (`Permission denied`). The fixture's
+    `python -m pytest` baseline errored, and the run carried on with a warning and suggestions
+    only, as designed. `tests/conftest.py` now puts the venv's `bin` first on PATH.
+  - `trace show` collapsed whitespace and lost the tree indentation.
+  - Refreshed findings kept their stale message.
+- 239 tests, 97% coverage (graph 99%, pipeline 100%, detectors 100%, verify 95%, render 95%).
+- **Done criteria:**
+  - A `# noqa` fix gets a `cheating_attempt` flag, is escalated, and appears in `trace show`
+    (`test_cli_trace.py::test_cheating_fix_is_flagged_and_shown`).
+  - A fix that introduces F541 is retried with the finding as feedback, then escalated at the
+    round limit, with `new_finding_introduced` ×2 and `round_limit_hit` flags
+    (`test_graph.py::test_new_finding_is_retried_then_escalated_at_the_round_limit`).
+
+Open:
+- Real run not done yet. Estimate for `repo_small`: ~$0.04, the M3 cost plus 5 Sonnet Verifier
+  calls.
+- M5: set `persist-credentials: false` on checkout, so a PR's test_command can't read the
+  token from `.git/config`. Removing it from the environment isn't enough.
+- Findings in files ruff fixed are reported at post-ruff line numbers, while ruff's own fixed
+  findings keep their original lines. It's consistent within a file's state, but mixed in the
+  report.
+- Test runs add up: one per fix round, plus the baseline and the post-ruff run. M6 on big repos
+  needs `test_timeout_s` and a fast test subset.

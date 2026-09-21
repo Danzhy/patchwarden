@@ -1,9 +1,8 @@
-"""Pydantic models shared by every stage: findings, pre-classification, scan results, edits.
-
-VerifyResult is added in M4, where it's first used.
-"""
+"""Pydantic models shared by every stage: findings, pre-classification, scan results, edits,
+verification."""
 
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -113,6 +112,56 @@ class TriageOutput(BaseModel):
     risk_notes: str = ""
 
 
+class TestStatus(StrEnum):
+    __test__ = False  # not a pytest test class
+
+    passed = "passed"
+    failed = "failed"
+    timeout = "timeout"
+    error = "error"  # the command couldn't run
+    skipped = "skipped"  # no test_command, or the tests already failed before any change
+
+
+class VerifyResult(BaseModel):
+    """The code checks on one fix (verify.verify_fix). Findings are "rule at file:line: message"
+    strings: this is what the Fixer gets back as feedback and what the trace stores."""
+
+    syntax_ok: bool
+    target_gone: bool = False
+    new_findings: list[str] = Field(default_factory=list)
+    # Other findings the fix made disappear: a fix changes one finding's code, nothing else.
+    also_resolved: list[str] = Field(default_factory=list)
+    tests: TestStatus = TestStatus.skipped
+    tests_detail: str = ""  # why skipped, or the tail of the output on failure
+    error: str | None = None  # the re-scan itself failed
+
+    @property
+    def passed(self) -> bool:
+        return not self.failures()
+
+    def failures(self) -> list[str]:
+        if not self.syntax_ok:
+            return [f"the edited file doesn't parse ({self.error})"]
+        if self.error:
+            return [f"re-scan failed: {self.error}"]
+        out = []
+        if not self.target_gone:
+            out.append("the analyzer still reports the finding")
+        out += [f"new finding: {f}" for f in self.new_findings]
+        out += [f"also changes code flagged by another finding: {f}" for f in self.also_resolved]
+        if self.tests in (TestStatus.failed, TestStatus.timeout, TestStatus.error):
+            out.append(f"tests {self.tests}: {self.tests_detail}")
+        return out
+
+
+class VerifierOutput(BaseModel):
+    """The Verifier agent's JSON reply: an independent review of the diff."""
+
+    verdict: Literal["pass", "fail"]
+    reason: str
+    behaviour_change_risk: Literal["low", "med", "high"]
+
+
 class FindingStatus(StrEnum):
     fixed = "fixed"  # in the patch
     suggested = "suggested"  # a proposed diff in the report, not in the patch
@@ -133,6 +182,8 @@ class FindingOutcome(BaseModel):
     rationale: str = ""
     diff: str = ""
     violations: list[Violation] = Field(default_factory=list)
+    verify: VerifyResult | None = None  # the last fix's code checks
+    verifier: VerifierOutput | None = None  # the last fix's review
     error: str | None = None
     reason: str = ""
 

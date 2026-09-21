@@ -1,8 +1,13 @@
-"""The per-finding graph (Triage -> clamp -> Fixer -> apply -> check_diff), driven through
-run_fix on tiny repos with a scripted LLM. Real ruff and bandit, no network."""
+"""The per-finding graph (Triage -> clamp -> Fixer -> apply -> check_diff -> verify ->
+Verifier), driven through run_fix on tiny repos with a scripted LLM. Real ruff and bandit, no
+network. Unless a test says otherwise the repo's "tests" pass and the Verifier passes a fix."""
+
+import dataclasses
+import shlex
+import sys
 
 import pytest
-from fake_llm import FakeTransport, fake_client, fixer_reply, triage_json
+from fake_llm import FakeTransport, fake_client, fixer_reply, triage_json, verifier_json
 
 from patchwarden.config import Config
 from patchwarden.llm import LLMError, RawReply
@@ -10,6 +15,7 @@ from patchwarden.models import FindingStatus
 from patchwarden.pipeline import run_fix
 from patchwarden.tracing.store import TraceStore
 
+TESTED = Config(test_command=f"{shlex.quote(sys.executable)} -c pass")
 F841_SRC = "def f():\n    unused = 0\n    return 1\n"
 B006_SRC = "def add(x, xs=[]):\n    xs.append(x)\n    return xs\n"
 
@@ -24,16 +30,20 @@ def make_repo(tmp_path, files: dict[str, str]):
 
 def fix(tmp_path, files, script, cfg=None, **kw):
     repo = make_repo(tmp_path, files)
-    transport = FakeTransport(script)
+    transport = FakeTransport({("verifier", "*"): verifier_json(), **script})
     store = TraceStore(tmp_path / "trace")
     res = run_fix(
         repo,
-        cfg or Config(),
+        cfg or TESTED,
         store=store,
         llm_factory=lambda c, run: fake_client(transport, c, run),
         **kw,
     )
     return res, transport, store, repo
+
+
+def flags(store, res):
+    return [f["detector"] for f in store.rows("flags", res.run_id)]
 
 
 def only(res):
@@ -55,9 +65,9 @@ def test_auto_fix_goes_into_the_patch(tmp_path):
     assert o.rationale == "scripted fix" and o.fix_rounds == 1
     assert "-    unused = 0" in res.patch
     assert (repo / "app/mod.py").read_text() == F841_SRC  # no --apply
-    assert t.roles() == [("triage", "ruff:F841"), ("fixer", "ruff:F841")]
-    # Triage runs with JSON mode; the fixer doesn't. Reasoning is off by default.
-    assert [c.json_mode for c in t.calls] == [True, False]
+    assert [role for role, _ in t.roles()] == ["triage", "fixer", "verifier"]
+    # Triage and the Verifier reply in JSON; the Fixer doesn't. Reasoning is off by default.
+    assert [c.json_mode for c in t.calls] == [True, False, True]
     assert not any(c.reasoning for c in t.calls)
     [row] = store.rows("findings", res.run_id)
     assert (row["status"], row["triage_decision"], row["final_decision"]) == (
@@ -148,7 +158,7 @@ def test_edit_retry_with_feedback(tmp_path):
 
 
 def test_edit_fails_twice(tmp_path):
-    res, t, _, _ = fix(
+    res, t, store, _ = fix(
         tmp_path,
         {"app/mod.py": F841_SRC},
         {
@@ -160,10 +170,11 @@ def test_edit_fails_twice(tmp_path):
     assert o.status == FindingStatus.failed and o.fix_rounds == 2
     assert "no SEARCH/REPLACE" in o.reason
     assert res.patch == "" and res.needs_human
+    assert flags(store, res) == ["round_limit_hit", "edit_apply_failed", "edit_apply_failed"]
 
 
 def test_suppression_is_rejected_and_restored(tmp_path):
-    res, _, store, _ = fix(
+    res, t, store, _ = fix(
         tmp_path,
         {"app/mod.py": F841_SRC},
         {
@@ -179,6 +190,9 @@ def test_suppression_is_rejected_and_restored(tmp_path):
     assert res.patch == ""
     [v] = store.rows("violations", res.run_id)
     assert v["kind"] == "suppression_added"
+    # A cheating attempt isn't retried, and never reaches the Verifier.
+    assert [role for role, _ in t.roles()] == ["triage", "fixer"]
+    assert flags(store, res) == ["cheating_attempt"]
 
 
 def test_editing_a_test_file_is_rejected(tmp_path):
@@ -231,7 +245,7 @@ def test_budget_exceeded_escalates_the_rest(tmp_path):
         tmp_path,
         {"app/mod.py": src},
         {("triage", "ruff:F841"): [expensive, expensive]},
-        cfg=Config(budget_usd=0.25),
+        cfg=dataclasses.replace(TESTED, budget_usd=0.25),
     )
     assert [o.status for o in res.outcomes] == ["escalated", "escalated"]
     # Bottom-up: g's finding was triaged first; f's was never sent.
@@ -287,6 +301,7 @@ def test_apply_refused_keeps_the_patch(tmp_path):
         {
             ("triage", "ruff:F841"): triage_json("auto_fix"),
             ("fixer", "ruff:F841"): fixer_reply("app/mod.py", "    unused = 0\n", ""),
+            ("verifier", "*"): verifier_json(),
         }
     )
 
@@ -295,8 +310,166 @@ def test_apply_refused_keeps_the_patch(tmp_path):
         return fake_client(transport, c, run)
 
     res = run_fix(
-        repo, Config(), store=TraceStore(tmp_path / "trace"), llm_factory=factory, apply=True
+        repo, TESTED, store=TraceStore(tmp_path / "trace"), llm_factory=factory, apply=True
     )
     assert "changed since scan" in res.apply_error and res.applied == []
     assert "-    unused = 0" in res.patch
     assert (repo / "app/mod.py").read_text().endswith("# edited\n")
+
+
+# --- M4: verify, the Verifier and the fix-round loop ---
+
+GOOD = fixer_reply("app/mod.py", "    unused = 0\n", "")
+# Removes the unused variable but adds an f-string without placeholders (ruff F541).
+NEW_FINDING = fixer_reply("app/mod.py", "    unused = 0\n", '    print(f"done")\n')
+AUTO = {("triage", "ruff:F841"): triage_json("auto_fix")}
+
+
+def test_new_finding_is_retried_then_escalated_at_the_round_limit(tmp_path):
+    res, t, store, _ = fix(
+        tmp_path, {"app/mod.py": F841_SRC}, {**AUTO, ("fixer", "ruff:F841"): [NEW_FINDING] * 2}
+    )
+    o = only(res)
+    assert o.status == FindingStatus.escalated and o.fix_rounds == 2
+    assert o.reason.startswith("no fix passed verification in 2 round(s); last: new finding: ")
+    assert "ruff:F541" in o.reason and res.patch == ""
+    # The Verifier never sees a fix that failed the code checks.
+    assert [role for role, _ in t.roles()] == ["triage", "fixer", "fixer"]
+    retry = t.calls[2].messages
+    assert retry[-2]["content"] == NEW_FINDING
+    assert (
+        "That fix was not accepted: new finding: ruff:F541 at app/mod.py:2" in retry[-1]["content"]
+    )
+    assert sorted(flags(store, res)) == [
+        "new_finding_introduced",
+        "new_finding_introduced",
+        "round_limit_hit",
+    ]
+
+
+def test_second_round_can_succeed(tmp_path):
+    res, t, store, _ = fix(
+        tmp_path, {"app/mod.py": F841_SRC}, {**AUTO, ("fixer", "ruff:F841"): [NEW_FINDING, GOOD]}
+    )
+    o = only(res)
+    assert o.status == FindingStatus.fixed and o.fix_rounds == 2
+    assert "-    unused = 0" in res.patch and "print" not in res.patch
+    assert flags(store, res) == ["new_finding_introduced"]
+
+
+def test_max_fix_rounds_is_configurable(tmp_path):
+    cfg = dataclasses.replace(TESTED, max_fix_rounds=3)
+    script = {**AUTO, ("fixer", "ruff:F841"): [NEW_FINDING, NEW_FINDING, GOOD]}
+    res, _, _, _ = fix(tmp_path, {"app/mod.py": F841_SRC}, script, cfg=cfg)
+    assert only(res).status == FindingStatus.fixed and only(res).fix_rounds == 3
+
+
+def test_syntax_error_is_retried_not_a_violation(tmp_path):
+    broken = fixer_reply("app/mod.py", "    unused = 0\n    return 1\n", "    return (1\n")
+    res, t, store, _ = fix(
+        tmp_path, {"app/mod.py": F841_SRC}, {**AUTO, ("fixer", "ruff:F841"): [broken, GOOD]}
+    )
+    assert only(res).status == FindingStatus.fixed
+    assert "doesn't parse" in t.calls[2].messages[-1]["content"]
+    assert store.rows("violations", res.run_id) == []
+
+
+def test_verifier_rejection_is_fed_back_to_the_fixer(tmp_path):
+    script = {
+        **AUTO,
+        ("fixer", "ruff:F841"): [GOOD, GOOD],
+        ("verifier", "ruff:F841"): [
+            verifier_json("fail", reason="drops a side effect"),
+            verifier_json(),
+        ],
+    }
+    res, t, _, _ = fix(tmp_path, {"app/mod.py": F841_SRC}, script)
+    o = only(res)
+    assert o.status == FindingStatus.fixed and o.fix_rounds == 2
+    fixer_calls = [c for c in t.calls if c.role == "fixer"]
+    assert (
+        "an independent review rejected it: drops a side effect"
+        in (fixer_calls[1].messages[-1]["content"])
+    )
+    # The Verifier gets the diff and the checks, not the Fixer's rationale.
+    review = [c for c in t.calls if c.role == "verifier"][0].messages[1]["content"]
+    assert "-    unused = 0" in review and "tests pass" in review
+    assert "scripted fix" not in review and "RATIONALE" not in review
+
+
+def test_high_risk_pass_becomes_a_suggestion(tmp_path):
+    script = {
+        **AUTO,
+        ("fixer", "ruff:F841"): GOOD,
+        ("verifier", "ruff:F841"): verifier_json("pass", "high", "callers may rely on it"),
+    }
+    res, _, _, repo = fix(tmp_path, {"app/mod.py": F841_SRC}, script)
+    o = only(res)
+    assert o.status == FindingStatus.suggested and res.patch == ""
+    assert "behaviour-change risk high: callers may rely on it" in o.reason
+    assert "-    unused = 0" in o.diff
+
+
+def test_untested_auto_fix_is_only_suggested(tmp_path):
+    script = {**AUTO, ("fixer", "ruff:F841"): GOOD}
+    res, t, _, _ = fix(tmp_path, {"app/mod.py": F841_SRC}, script, cfg=Config())
+    o = only(res)
+    assert o.status == FindingStatus.suggested and res.patch == ""
+    assert o.reason == "untested, so not applied automatically: no test_command configured"
+    assert o.verify.tests == "skipped"
+    review = [c for c in t.calls if c.role == "verifier"][0].messages[1]["content"]
+    assert "The tests were not run (no test_command configured)" in review
+
+
+def test_failing_tests_are_retried_then_escalated(tmp_path):
+    check = "from app.mod import f; assert f() == 1"
+    cfg = Config(test_command=f"{shlex.quote(sys.executable)} -c {shlex.quote(check)}")
+    breaks = fixer_reply("app/mod.py", "    unused = 0\n    return 1\n", "    return 2\n")
+    script = {**AUTO, ("fixer", "ruff:F841"): [breaks, breaks]}
+    res, _, store, _ = fix(tmp_path, {"app/mod.py": F841_SRC}, script, cfg=cfg)
+    o = only(res)
+    assert o.status == FindingStatus.escalated and "tests failed" in o.reason
+    assert res.patch == ""
+    assert sorted(flags(store, res)) == ["round_limit_hit", "tests_broke", "tests_broke"]
+
+
+def test_failing_baseline_means_suggestions_only(tmp_path):
+    cfg = Config(test_command=f"{shlex.quote(sys.executable)} -c 'raise SystemExit(1)'")
+    script = {**AUTO, ("fixer", "ruff:F841"): GOOD}
+    res, _, _, _ = fix(tmp_path, {"app/mod.py": F841_SRC}, script, cfg=cfg)
+    assert only(res).status == FindingStatus.suggested
+    assert any("already failed before any change" in w for w in res.warnings)
+    assert res.tests_skipped.startswith("the tests already failed")
+
+
+def test_tests_failing_after_ruff_revert_its_fixes(tmp_path):
+    # ruff removes the unused import; this repo's "test" needs it.
+    check = (
+        "import pathlib, sys; sys.exit('import os' not in pathlib.Path('app/mod.py').read_text())"
+    )
+    cfg = Config(test_command=f"{shlex.quote(sys.executable)} -c {shlex.quote(check)}")
+    src = "import os\n\n\ndef f():\n    return 1\n"
+    res, _, store, _ = fix(tmp_path, {"app/mod.py": src}, {}, cfg=cfg, no_llm=True)
+    assert res.reverted == {"app/mod.py": "the tests failed after ruff's fixes"}
+    assert res.patch == "" and only(res).status == FindingStatus.not_triaged
+    assert flags(store, res) == ["tests_broke"]
+
+
+def test_budget_hit_at_the_verifier_restores_the_file(tmp_path):
+    cfg = dataclasses.replace(TESTED, budget_usd=0.002)  # triage + fixer spend it
+    res, t, store, _ = fix(
+        tmp_path, {"app/mod.py": F841_SRC}, {**AUTO, ("fixer", "ruff:F841"): GOOD}, cfg=cfg
+    )
+    assert only(res).status == FindingStatus.escalated and res.patch == ""
+    assert res.outcome == "budget_exceeded"
+    assert [role for role, _ in t.roles()] == ["triage", "fixer"]
+    assert flags(store, res) == ["cost_over_budget"]
+
+
+def test_verifier_invalid_json_escalates(tmp_path):
+    script = {**AUTO, ("fixer", "ruff:F841"): GOOD, ("verifier", "ruff:F841"): ["no", "nope"]}
+    res, _, store, _ = fix(tmp_path, {"app/mod.py": F841_SRC}, script)
+    o = only(res)
+    assert o.status == FindingStatus.escalated and o.reason.startswith("verifier failed")
+    assert res.patch == ""
+    assert flags(store, res) == ["invalid_json_from_llm"]

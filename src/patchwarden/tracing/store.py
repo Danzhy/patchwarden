@@ -72,6 +72,9 @@ def _json(value: Any) -> str | None:
     return redact(json.dumps(value, default=str, ensure_ascii=False))
 
 
+TABLES = ("runs", "steps", "findings", "violations", "flags")
+
+
 class TraceStore:
     def __init__(self, trace_dir: Path):
         self.dir = trace_dir
@@ -107,7 +110,10 @@ class TraceStore:
         )
         return run
 
-    def rows(self, table: str, run_id: str) -> list[dict]:
+    def rows(self, table: str, run_id: str | None = None) -> list[dict]:
+        """A table's rows, for one run or (run_id None) all of them."""
+        if run_id is None:
+            return [dict(r) for r in self.db.execute(f"SELECT * FROM {table}")]
         cur = self.db.execute(f"SELECT * FROM {table} WHERE run_id = ?", (run_id,))
         return [dict(r) for r in cur]
 
@@ -213,11 +219,10 @@ class Run:
             detail=f"{v.file}: {v.detail}",
         )
 
-    def cost(self) -> float:
-        cur = self.store.db.execute(
-            "SELECT COALESCE(SUM(cost), 0) FROM steps WHERE run_id = ?", (self.run_id,)
+    def flag(self, finding_id: str | None, detector: str, detail: str) -> None:
+        self.insert(
+            "flags", run_id=self.run_id, finding_id=finding_id, detector=detector, detail=detail
         )
-        return cur.fetchone()[0]
 
     def finish(self, outcome: str) -> dict:
         tin, tout, cost = self.store.db.execute(

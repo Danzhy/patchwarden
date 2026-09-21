@@ -11,8 +11,8 @@ from importlib.resources import files
 
 from patchwarden.workspace import split_lines
 
-PROMPT_VERSION = "m3.1"
-ROLES = ("triage", "fixer")
+PROMPT_VERSION = "m4.1"
+ROLES = ("triage", "fixer", "verifier")
 TAG = "untrusted_repo_content"
 _CLOSE = re.compile(rf"</\s*{TAG}", re.IGNORECASE)
 

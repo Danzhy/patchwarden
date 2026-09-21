@@ -72,8 +72,12 @@ class Config:
             "codeql:py/modification-of-default-value",
         ]
     )
+    # Run in the workspace after every fix (no shell, secrets removed from the environment).
+    # Without it, Fixer changes are only ever suggested: untested code is never auto-fixed.
     test_command: str | None = None
     test_timeout_s: int = 300
+    # Fixer calls per finding, counting the retries after an edit that doesn't apply, a failed
+    # check and a Verifier rejection.
     max_fix_rounds: int = 2
     max_lines_changed: int = 30
     budget_usd: float = 0.50
