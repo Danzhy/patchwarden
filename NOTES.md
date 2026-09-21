@@ -81,10 +81,26 @@ drop any repo whose suite takes more than about 60 s.
 EvalPlus MBPP+ (tasks with strong tests). Deferred, since B is optional.
 
 ### OpenRouter (`spikes/openrouter_call.py`)
-- **Not run yet:** there's no `OPENROUTER_API_KEY` in the environment or `.env`.
-- Default model candidates from the public model list (price per M tokens, input/output), used
-  only as config defaults and always overridable:
+- **Default model candidates** (price per M tokens, input/output; defaults only, always
+  overridable in config):
   - triage (cheap): `deepseek/deepseek-v4.1-flash` ($0.15 / $0.60)
   - fixer and verifier (strong): `anthropic/claude-sonnet-5` ($2 / $10)
-- Still to confirm: `response_format=json_object` is honoured, and `usage` includes `cost` when
-  `usage: {include: true}` is sent.
+- **Pitfall: reasoning is on by default.** With `max_tokens=200`, and again with 1000,
+  deepseek-v4.1-flash spent every output token reasoning: `finish_reason="length"`,
+  `reasoning_tokens=1000`, `content=None`. That call cost $0.0009 and returned no answer.
+- With `extra_body={"reasoning": {"enabled": False}}`, the same prompt returned valid JSON with
+  `finish_reason="stop"` in 1.4 s, using 39 prompt and 54 completion tokens, for $0.0000765.
+- `response_format={"type": "json_object"}` is honoured, and the output parsed first time.
+- **Cost is reported directly** when `extra_body={"usage": {"include": True}}` is sent:
+  `usage.cost` (USD), plus `cost_details` and `completion_tokens_details.reasoning_tokens`. So
+  there's no need to keep a price table in the code.
+- Sandbox: Python's TLS through the Claude Code sandbox proxy fails with `OSStatus -26276`
+  (certificate trust), so real LLM calls run unsandboxed. This doesn't affect tests, which make
+  no network calls.
+
+Consequences for `llm.py` (M3):
+- A `reasoning` setting per role in config. Default: off for triage; the fixer and verifier
+  defaults get decided when M3 is tested against real models.
+- Treat `finish_reason == "length"` with empty content as its own error
+  (`llm_truncated`, logged as a `step_error`), separate from `invalid_json_from_llm`.
+- Take cost from `usage.cost`, and record `reasoning_tokens` in the step's trace row.
