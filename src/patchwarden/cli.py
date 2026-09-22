@@ -105,6 +105,7 @@ def fix(
     """Fix findings in a temporary copy; write a patch and a report. The repo changes only
     with --apply. Exit code 1 if anything needs a human (escalated or not fixable)."""
     import dataclasses
+    import os
     from collections import Counter
 
     from patchwarden.analyzers import AnalyzerError
@@ -124,7 +125,14 @@ def fix(
         store = TraceStore(trace_dir)
         try:
             res = run_fix(
-                repo, cfg, store=store, llm_factory=make_llm, base=base, no_llm=no_llm, apply=apply
+                repo,
+                cfg,
+                store=store,
+                llm_factory=make_llm,
+                base=base,
+                no_llm=no_llm,
+                apply=apply,
+                trigger="ci" if os.environ.get("GITHUB_ACTIONS") == "true" else "cli",
             )
         finally:
             store.close()
@@ -139,7 +147,10 @@ def fix(
     for path in (output, report):
         path.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(res.patch)
-    report.write_text(res.report(str(output)))
+    # Side by side (the default, and CI's artifact): the report names the patch, not a path
+    # that only exists on the machine that wrote it.
+    same_dir = output.resolve().parent == report.resolve().parent
+    report.write_text(res.report(output.name if same_dir else str(output)))
 
     n = {s: sum(1 for o in res.outcomes if o.status == s) for s in FindingStatus}
     by_ruff = sum(1 for o in res.outcomes if o.fixed_by == "ruff")

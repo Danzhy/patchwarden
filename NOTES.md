@@ -460,3 +460,26 @@ Open:
   there, so it used to write one that never ran.
 - The repo-slug check also refuses `.`/`..` components.
 - 280 tests; actionlint clean.
+
+### Real PR (2026-09-22, M5 done)
+[Danzhy/patchwarden-demo#1](https://github.com/Danzhy/patchwarden-demo/pull/1) is a throwaway
+repo. `main` holds the clean module, its test, `test_command = "python -m pytest -q"` and the
+workflow, which pins `patchwarden @ git+…@f839d02`. The PR adds the fixture's warning modules.
+- **The `pull_request` run** ([35695657565](https://github.com/Danzhy/patchwarden-demo/actions/runs/35695657565))
+  had `fix` take 1m26s and `comment` 24s.
+  - Findings: 15, of which 8 were auto-fixed (6 by ruff, 2 by the Fixer), 3 suggested and 4
+    escalated. These match the offline end-to-end test.
+  - LLM cost $0.0383, with 19k tokens in and 2.4k out.
+  - Tests passed at baseline, after ruff, and after each of the 5 fixes.
+  - The comment was posted by `github-actions[bot]`.
+  - The artifact holds the patch, the report, `traces.db` and the JSONL. No key or `sk-or-`
+    appears anywhere in the trace.
+- **The `push` run for the same commit** (22s) got no key, as designed. It showed the
+  `::notice::`, ran ruff only, and skipped the comment job.
+- Fixed after the run:
+  - The report named the patch by its runner path (`/home/runner/work/_temp/…`). A patch next
+    to the report is now named by its file name.
+  - Runs under GitHub Actions are traced as `trigger=ci`, not `cli`.
+  - The workflow's actions are now pinned to commit SHAs, each with the release tag in a
+    comment. A test checks that every `uses:` is pinned.
+- 282 tests; actionlint clean.

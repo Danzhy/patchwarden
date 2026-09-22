@@ -86,13 +86,26 @@ def invoke(tmp_path, repo, *extra):
     )
 
 
+def test_in_github_actions(tmp_path, fake, monkeypatch):
+    """trigger=ci, and a patch outside the report's directory is named by its path."""
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    repo = copy_repo(tmp_path)
+    patch = tmp_path / "elsewhere" / "fixes.patch"
+    res = invoke(tmp_path, repo, "--output", str(patch))
+    assert res.exit_code == 1, res.output
+    assert f"All of these are in `{patch}`." in (tmp_path / "report.md").read_text()
+    [run] = db_rows(tmp_path, "SELECT trigger FROM runs")
+    assert run["trigger"] == "ci"
+
+
 def db_rows(tmp_path, sql):
     db = sqlite3.connect(tmp_path / "trace/traces.db")
     db.row_factory = sqlite3.Row
     return [dict(r) for r in db.execute(sql)]
 
 
-def test_full_fix_with_fake_llm(tmp_path, fake):
+def test_full_fix_with_fake_llm(tmp_path, fake, monkeypatch):
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
     repo = copy_repo(tmp_path)
     before = snapshot(repo)
     res = invoke(tmp_path, repo)
@@ -110,6 +123,7 @@ def test_full_fix_with_fake_llm(tmp_path, fake):
     assert "auth/tokens.py" not in patch
 
     report = (tmp_path / "report.md").read_text()
+    assert "All of these are in `out.patch`." in report  # next to the report: its name
     suggested = report.split("## Suggested")[1].split("## Escalated")[0]
     assert suggested.count("**ruff:") == 3 and "+def append_item(item, bucket=None):" in suggested
     # SIM103 in utils.py was refreshed from the re-scan after the E711 fix above it.

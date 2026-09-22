@@ -1,6 +1,7 @@
 """M5: the init-ci workflow, the PR comment, and reading the policy from the base branch."""
 
 import json
+import re
 import subprocess
 
 import httpx
@@ -48,6 +49,14 @@ def test_workflow_triggers_and_permissions(wf):
     )
     assert doc["jobs"]["fix"]["permissions"] == {"contents": "read"}
     assert doc["jobs"]["comment"]["permissions"] == {"pull-requests": "write"}
+
+
+def test_actions_are_pinned_to_commits(wf):
+    """A tag can be moved to other code; a commit SHA can't."""
+    _, doc = wf
+    uses = [s["uses"] for job in doc["jobs"].values() for s in job["steps"] if "uses" in s]
+    assert len(uses) == 5
+    assert all(re.fullmatch(r"actions/[\w-]+@[0-9a-f]{40}", u) for u in uses), uses
 
 
 def test_fix_job_isolates_the_prs_code(wf):
